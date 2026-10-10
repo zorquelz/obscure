@@ -1,0 +1,55 @@
+# Obscure Repository .gitignore
+# Zorquelz Technologies
+
+# Secrets, Credentials, and Local Environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+secrets/
+credentials.json
+
+# Chromium Checkout & Build Artefacts (NEVER commit full Chromium tree)
+chromium/
+depot_tools/
+.gclient
+.gclient_entries
+out/
+build/
+dist/
+*.obj
+*.o
+*.a
+*.so
+*.dll
+*.exe
+*.ninja
+*.ninja_deps
+*.ninja_log
+
+# OS & Editor Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+*.bak
+
+# Node & Package Managers (WebUI prototyping)
+node_modules/
+package-lock.json.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local Scratch & Temporary Logs
+*.log
+temp/
+tmp/
+scratch/
