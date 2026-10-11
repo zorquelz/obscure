@@ -1,18 +1,19 @@
 # HOOKS.md — Chromium External Integration Points
 **Zorquelz Technologies | Obscure Browser Engineering**
+**Baseline:** Chromium Stable `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`)
 
 > This document catalogs every file and code location outside `//chrome/browser/obscure/` that Obscure modifies or extends. 
 > To minimize merge conflicts during upstream rebases, modifications outside our isolated module directory are strictly limited to necessary registration hooks.
 
 ---
 
-## Catalog of External Hooks
+## Catalog of External Hooks (Re-Derived on Stable 155)
 
-| Hook ID | Target File in Chromium Tree | Verified Source Line Range | Purpose / Responsibility | Estimated Diff Size | Rebase / Churn Risk |
+| Hook ID | Target File in Chromium Tree | Line in Stable 155 | Purpose / Responsibility | Estimated Diff Size | Rebase / Churn Risk |
 |---|---|---|---|---|---|
-| **HK-01** | `chrome/browser/ui/webui/chrome_web_ui_configs.cc` | Lines 335 & 464 | Register `ObscureNewTabPageUIConfig` in `RegisterChromeWebUIConfigs()` (substituting default `NewTabPageUIConfig` on `chrome::kChromeUINewTabPageHost`) | ~3 lines | **Low** |
-| **HK-02** | `chrome/browser/BUILD.gn` | Lines 1081–1095 | Add `"//chrome/browser/obscure"` to the dependencies of the main browser library target (`source_set("browser")`) | ~2 lines | **Low** |
-| **HK-03** | `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc` | Lines 1599–1605 | Initialize `ObscureWorkspaceServiceFactory::GetInstance()` inside `EnsureBrowserContextKeyedServiceFactoriesBuilt()` | ~3 lines | **Low** |
+| **HK-01** | `chrome/browser/ui/webui/chrome_web_ui_configs.cc` | Line 333 | Register `ObscureNewTabPageUIConfig` in `RegisterChromeWebUIConfigs()` (substituting default `NewTabPageUIConfig` on `chrome::kChromeUINewTabPageHost`) | ~3 lines | **Low** |
+| **HK-02** | `chrome/browser/BUILD.gn` | Lines 1077–1085 | Add `"//chrome/browser/obscure"` to the dependencies of the main browser library target (`source_set("browser")`) | ~2 lines | **Low** |
+| **HK-03** | `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc` | Lines 1605–1610 | Initialize `ObscureWorkspaceServiceFactory::GetInstance()` inside `EnsureBrowserContextKeyedServiceFactoriesBuilt()` | ~3 lines | **Low** |
 | **HK-04** | `chrome/browser/resources/BUILD.gn` or WebUIDataSource | Component resource mapping | WebUI Resource Packaging: Serve bundled HTML, CSS, and TS assets to the renderer via `content::WebUIDataSource` | ~5 lines | **Low** |
 
 ---
@@ -21,7 +22,7 @@
 
 ### HK-01: WebUI Configuration Registration
 - **File:** `chrome/browser/ui/webui/chrome_web_ui_configs.cc`
-- **Verified Code Context (Line 335):**
+- **Verified Code Context (Line 333 on Stable 155):**
   ```cpp
   map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());
   ```
@@ -35,13 +36,10 @@
 
 ### HK-02: Browser Build Target Dependency
 - **File:** `chrome/browser/BUILD.gn`
-- **Verified Code Context (Lines 1081–1095):**
+- **Verified Code Context (Lines 1077–1085 on Stable 155):**
   ```gn
-  "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
-  "//chrome/browser/ui/webui:configs",
-  "//chrome/browser/ui/webui:log_web_ui_url",
-  "//chrome/browser/ui/webui/actor_internals",
   "//chrome/browser/ui/webui/bluetooth_internals",
+  "//chrome/browser/ui/webui/bluetooth_internals:mojo_bindings",
   "//chrome/browser/ui/webui/chrome_urls",
   "//chrome/browser/ui/webui/connectors_internals",
   ```
@@ -53,7 +51,7 @@
 
 ### HK-03: Keyed Service Lifecycle Attachment
 - **File:** `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc`
-- **Verified Code Context (Lines 1599–1605):**
+- **Verified Code Context (Lines 1605–1610 on Stable 155):**
   ```cpp
   WebDataServiceFactory::GetInstance();
   webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
@@ -70,7 +68,7 @@
 ### HK-04: WebUI Resource Packaging
 - **Options Evaluated:**
   1. *Option A (In-binary string bundle for Tracer Bullet / MVP):* Embed the HTML/CSS/JS payload directly in C++ string literals or simple file reader in `ObscureNewTabPageUI::CreateDataSource()`. Zero GN touchpoints outside `//chrome/browser/obscure/`.
-  2. *Option B (GN `build_webui` rule):* Use `//ui/webui/resources/tools/build_webui.gni` inside `//chrome/browser/obscure/resources/BUILD.gn` to emit a `.pak` file, and declare it in `chrome/chrome_paks.gni` line 260.
+  2. *Option B (GN `build_webui` rule):* Use `//ui/webui/resources/tools/build_webui.gni` inside `//chrome/browser/obscure/resources/BUILD.gn` to emit a `.pak` file, and declare it in `chrome/chrome_paks.gni`.
 - **Recommendation:** **Option A** for the initial tracer bullet (zero external packaging hooks); transition to **Option B** when the full TypeScript interface is locked.
 
 ---
