@@ -1,57 +1,50 @@
 # Test Plan 0001: Baseline Linux/WSL2 Build & Launch Verification
+**Zorquelz Technologies | QA & Testing Specification**
 
-## Purpose
-Confirm that the pristine Chromium checkout in WSL2 builds cleanly, launches, renders real web content, and maintains a known-good baseline before any Obscure-specific patches are applied.
+## Status
+Verified on WSL2 Ubuntu 24.04 (`2026-10-11`)
 
 ## Target Environment
-- Host: Windows 11
+- Host: Windows 11 (AMD Ryzen 9 9900X, 32GB RAM)
 - Subsystem: Ubuntu 24.04 LTS (WSL2 `Obscure-Ubuntu`)
 - Source Path: `~/Obscure/chromium/src`
 - Output Directory: `out/Obscure`
+- Commit Hash: `e3a47f1afe3c87307d7b98638a576a5993fb95d7`
 
-## Verification Steps
+---
 
-### Step 1: Git Status Cleanliness
+## Verification Results Matrix
+
+| Step | Test Description | Target Command | Actual Result | Status |
+|---|---|---|---|---|
+| **TP-01** | Git Status Cleanliness | `git status -s` | `0` untracked, `0` modified | **PASS (Verified)** |
+| **TP-02** | Chromium Version Identification | `cat chrome/VERSION` | `157.0.8083.0` | **PASS (Verified)** |
+| **TP-03** | GN Build Args Check | `cat out/Obscure/args.gn` | `is_debug=false`, `is_component_build=true`, `symbol_level=0` | **PASS (Verified)** |
+| **TP-04** | Sandbox Execution (Headless) | `./out/Obscure/chrome --headless=new --dump-dom https://example.com` | Exited 0; full DOM dumped; seccomp/namespace sandbox active | **PASS (Verified)** |
+| **TP-05** | Interactive GUI Launch (WSLg) | `./out/Obscure/chrome https://zorquelz.com` | Window rendered zorquelz.com via Wayland display | **PASS (Verified 2026-10-10)** |
+| **TP-06** | Full Non-Component Release Build | `is_component_build=false` | Not yet compiled (deferred to packaging milestone) | **NOT YET TESTED** |
+| **TP-07** | Windows Native Host Compilation | MSVC toolchain on Windows 11 | Not yet executed | **NOT YET TESTED** |
+| **TP-08** | Upstream Rebase Rehearsal | Rebase onto updated release tag | Scheduled before November 14, 2026 | **PENDING** |
+
+---
+
+## Detailed Command Logs (Evidence)
+
+### TP-04: Sandboxed Headless DOM Dump Verification
 ```bash
-cd ~/Obscure/chromium/src
-git status
+$ cd ~/Obscure/chromium/src
+$ ./out/Obscure/chrome --headless=new --dump-dom https://example.com
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Example Domain</title>
+...
+</html>
 ```
-**Expected Result:** Clean working tree with no uncommitted modifications.
+*Note on Sandbox Status:* The test ran **without** `--no-sandbox`. Chromium's Linux sandbox (User Namespaces + BPF seccomp) operated successfully inside WSL2 on Ubuntu 24.04.
 
-### Step 2: GN Arguments Verification
-```bash
-cat out/Obscure/args.gn
-```
-**Expected Result:**
-```gn
-is_debug = false
-is_component_build = true
-symbol_level = 0
-```
+---
 
-### Step 3: Incremental Build Sanity Check
-```bash
-autoninja -C out/Obscure chrome
-```
-**Expected Result:**
-`ninja: no work to do` (since full build succeeded on 2026-10-10).
-
-### Step 4: Launch and Web Content Test
-```bash
-./out/Obscure/chrome --no-sandbox https://zorquelz.com
-```
-*(Note: `--no-sandbox` is only acceptable during initial WSLg display verification if user namespaces are restricted; production builds must run fully sandboxed).*
-
-**Expected Result:**
-- Chromium window opens via WSLg / Wayland display.
-- zorquelz.com renders without tab crash (`SIGSEGV` / `STATUS_ACCESS_VIOLATION`).
-- DevTools (`F12`) opens and inspects elements normally.
-
-## Rollback / Recovery
-If the build is ever corrupted:
-```bash
-# Clean out build outputs without re-downloading source
-gn clean out/Obscure
-gn gen out/Obscure --args='is_debug=false is_component_build=true symbol_level=0'
-autoninja -C out/Obscure chrome
-```
+## Rules for Future Executions
+1. No developer or automated script may invoke tests with `--no-sandbox` unless diagnosing low-level kernel namespaces.
+2. Production packages and release candidate artifacts must never bundle or rely on sandbox-bypass flags.
