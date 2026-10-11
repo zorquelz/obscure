@@ -66,28 +66,34 @@ PATCH=0
 
 ---
 
-## 3. ImportantFileWriter Deep Dive
+## 3. ImportantFileWriter Deep Dive & Threading Invariants
 
 Inspected: `base/files/important_file_writer.h` and `base/files/important_file_writer.cc`.
 
-### Critical Finding: The 10-Second Debounce Window
+### Threading Architecture (Strictly Off-UI-Thread)
+- In Chromium, **synchronous disk I/O on the UI thread triggers `DCHECK` panics and browser jank**.
+- All writes dispatched by `ImportantFileWriter` execute on a background `SequencedTaskRunner` (`base::ThreadPool::CreateSequencedTaskRunner({base::MayBlock(), base::TaskPriority::USER_VISIBLE, base::TaskShutdownBehavior::BLOCK_SHUTDOWN})`).
+- Calling `WriteNow()` serializes strings on the UI thread and immediately posts the write task to the background sequence without blocking the UI message pump.
+
+### The 10-Second Debounce Window Discovery
 In `base/files/important_file_writer.cc` (line 46):
 ```cpp
 constexpr auto kDefaultCommitInterval = Seconds(10);
 ```
 - **Risk:** If `ScheduleWrite()` is called, data remains in memory for up to **10 seconds** before flushing to disk. An abrupt process termination (`SIGKILL`, OS shutdown, crash) within this window causes silent loss of space updates.
 - **Requirement:** 
-  1. We must configure a custom provisional debounce interval of `base::Milliseconds(500)`.
-  2. Critical events (**Space creation, deletion, rename, tab closure, window close, browser shutdown**) must bypass the timer and call `WriteNow()` / `DoScheduledWrite()` immediately.
+  1. We must configure a custom provisional debounce interval of `base::Milliseconds(500)` for non-critical tab focus and scroll events.
+  2. Critical events (**Space creation, deletion, rename, tab closure, window close, browser shutdown**) must bypass the timer and trigger immediate asynchronous dispatch via `ImportantFileWriter::WriteNow()`.
 
-### Crash Resilience Limitations
+### Crash Resilience Boundaries
 In `base/files/important_file_writer.h` (line 79):
 ```cpp
 // Does not guarantee file integrity across system crash... thus using
 // ImportantFileWriter is not a valid substitute for file integrity checks
 // and recovery codepaths for malformed files.
 ```
-- **Requirement:** 
+- **Contract:** Protects against **application-level crashes** during write via temp-file creation and atomic rename. Does not protect against hard kernel panics or power outages before hardware write caches sync.
+- **Mitigation:**
   1. Must maintain a `.bak` backup file (`obscure_spaces.json.bak`).
   2. Rotate backup only **after** the replacement file has been verified on disk.
   3. Validate JSON schema version on load; if corrupted, fallback to `.bak` automatically.
@@ -106,38 +112,46 @@ In `base/files/important_file_writer.h` (line 79):
 
 ---
 
-## 4. WebUI Registration & NTP Override
+## 4. WebUI Registration & NTP Override (Exact Source Lines)
 
 ### WebUI Registration Architecture in Chromium 157
 In modern Chromium (v157), WebUI pages do NOT register via the legacy `ChromeWebUIControllerFactory`. They use `content::WebUIConfigMap`.
 
-Verified in `chrome/browser/ui/webui/chrome_web_ui_configs.cc` (lines 250, 267):
-```cpp
-void RegisterChromeWebUIConfigs() {
-  auto& map = content::WebUIConfigMap::GetInstance();
-  map.AddWebUIConfig(std::make_unique<AccessibilityUIConfig>());
-  // ...
-}
-```
+Verified in `chrome/browser/ui/webui/chrome_web_ui_configs.cc`:
+- Line 250: `void RegisterChromeWebUIConfigs()`
+- Line 267: `auto& map = content::WebUIConfigMap::GetInstance();`
+- Line 335: `map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());`
+- Line 464: `map.AddWebUIConfig(std::make_unique<SandboxInternalsUIConfig>());` (serves `chrome://sandbox`)
 
-### New Tab Page Integration Comparison
-- **Option A (Direct Config Substitution):**
-  - Line 335 in `chrome/browser/ui/webui/chrome_web_ui_configs.cc`:
-    ```cpp
-    map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());
-    ```
-  - Substitute with `ObscureNewTabPageUIConfig` handling `chrome::kChromeUINewTabPageHost`.
-  - Touches exactly **1 file** outside `//chrome/browser/obscure/`.
-- **Option B (URL Rewrite Interception):**
-  - Intercept `search::HandleNewTabURLRewrite` in `chrome/browser/search/search.cc` (line 408) to rewrite `chrome://newtab/` to `chrome://obscure-newtab/`.
-  - Touches 4 external files (`webui_url_constants.h`, `webui_url_constants.cc`, `chrome_web_ui_configs.cc`, `search.cc`).
-- **Conclusion:** **Option A** is significantly less invasive and reduces rebase maintenance risk.
+### Verified Line Evidence for Build & Lifecycle Hooks
+- **HK-02 (Build Target Dependency):** `chrome/browser/BUILD.gn` lines 1081–1095:
+  ```gn
+  "//chrome/browser/ui/webui:configs",
+  "//chrome/browser/ui/webui:log_web_ui_url",
+  "//chrome/browser/ui/webui/actor_internals",
+  "//chrome/browser/ui/webui/bluetooth_internals",
+  "//chrome/browser/ui/webui/chrome_urls",
+  "//chrome/browser/ui/webui/connectors_internals",
+  ```
+- **HK-03 (Keyed Service Factory):** `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc` lines 1599–1605:
+  ```cpp
+  WebDataServiceFactory::GetInstance();
+  webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
+  ```
 
 ---
 
-## 5. Linux Sandbox Status Verification
+## 5. Linux Sandbox Status & Interactive Launch (TP-05)
 
-Verified execution of `./out/Obscure/chrome` in Ubuntu 24.04 (WSL2):
+### Exact Interactive Launch Command (TP-05)
+```bash
+$ ./out/Obscure/chrome https://zorquelz.com
+```
+- **Execution Context:** Launched in Ubuntu 24.04 LTS running under WSL2 with WSLg (Wayland/XWayland display server).
+- **Flags Used:** **Zero sandbox-disabling flags**. No `--no-sandbox`, no `--disable-gpu-sandbox`.
+- **Observed Behavior:** Window initialized, connected to Wayland display, rendered `https://zorquelz.com` with working TLS, DOM, and JavaScript execution.
+
+### Headless Sandboxed Execution Verification (TP-04)
 ```bash
 $ ./out/Obscure/chrome --headless=new --dump-dom https://example.com
 ```

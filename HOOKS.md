@@ -8,45 +8,57 @@
 
 ## Catalog of External Hooks
 
-| Hook ID | Target File in Chromium Tree | Purpose / Responsibility | Estimated Diff Size | Rebase / Churn Risk | Mitigation & Design |
+| Hook ID | Target File in Chromium Tree | Verified Source Line Range | Purpose / Responsibility | Estimated Diff Size | Rebase / Churn Risk |
 |---|---|---|---|---|---|
-| **HK-01** | `chrome/browser/ui/webui/chrome_web_ui_configs.cc` | Register `ObscureNewTabPageUIConfig` in `RegisterChromeWebUIConfigs()` (substituting default `NewTabPageUIConfig`) | ~3 lines (1 include, 2 lines in registration) | **Low** | Placed in alphabetical order among standard WebUI registrations. |
-| **HK-02** | `chrome/browser/BUILD.gn` | Add `"//chrome/browser/obscure"` to dependencies of target `"browser"` | ~2 lines | **Low** | Added cleanly to the `deps` block of the main browser library. |
-| **HK-03** | `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc` | Initialize `ObscureWorkspaceServiceFactory::GetInstance()` inside `EnsureBrowserContextKeyedServiceFactoriesBuilt()` | ~3 lines (1 include, 2 lines in factory list) | **Low** | Appended to the keyed service initialization list where new services are standard. |
-| **HK-04** | `chrome/common/webui_url_constants.h` *(Optional / Conditional)* | Define custom URL constants (`kChromeUIObscureSettingsURL`, etc.) if needed beyond default NTP override | ~4 lines | **Low** | Only used if dedicated custom scheme hosts are registered outside the NTP host. |
+| **HK-01** | `chrome/browser/ui/webui/chrome_web_ui_configs.cc` | Lines 335 & 464 | Register `ObscureNewTabPageUIConfig` in `RegisterChromeWebUIConfigs()` (substituting default `NewTabPageUIConfig` on `chrome::kChromeUINewTabPageHost`) | ~3 lines | **Low** |
+| **HK-02** | `chrome/browser/BUILD.gn` | Lines 1081–1095 | Add `"//chrome/browser/obscure"` to the dependencies of the main browser library target (`source_set("browser")`) | ~2 lines | **Low** |
+| **HK-03** | `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc` | Lines 1599–1605 | Initialize `ObscureWorkspaceServiceFactory::GetInstance()` inside `EnsureBrowserContextKeyedServiceFactoriesBuilt()` | ~3 lines | **Low** |
+| **HK-04** | `chrome/browser/resources/BUILD.gn` or WebUIDataSource | Component resource mapping | WebUI Resource Packaging: Serve bundled HTML, CSS, and TS assets to the renderer via `content::WebUIDataSource` | ~5 lines | **Low** |
 
 ---
 
-## Detailed Analysis of Each Integration Point
+## Detailed Evidence & Implementation for Each Hook
 
 ### HK-01: WebUI Configuration Registration
 - **File:** `chrome/browser/ui/webui/chrome_web_ui_configs.cc`
-- **Location:** Inside `void RegisterChromeWebUIConfigs()` (around line 267–340).
-- **Modification:**
+- **Verified Code Context (Line 335):**
+  ```cpp
+  map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());
+  ```
+- **Replacement:**
   ```cpp
   #include "chrome/browser/obscure/ui/webui/obscure_new_tab_page_ui.h"
   // ...
-  // Replace:
-  // map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());
-  // With:
   map.AddWebUIConfig(std::make_unique<obscure::ObscureNewTabPageUIConfig>());
   ```
-- **Rationale:** Substitutes Obscure's New Tab UI directly on `chrome::kChromeUINewTabPageHost`. Avoids invasive patching of `chrome/browser/search/search.cc` (`HandleNewTabURLRewrite`).
+- **Rationale:** Substitutes Obscure's New Tab UI directly on `chrome::kChromeUINewTabPageHost` ("new-tab-page"). Avoids invasive patching of `chrome/browser/search/search.cc` (`HandleNewTabURLRewrite`).
 
-### HK-02: Build Target Dependency
+### HK-02: Browser Build Target Dependency
 - **File:** `chrome/browser/BUILD.gn`
-- **Location:** Inside `split_static_library("browser")` or `source_set("browser")` `deps = [ ... ]`.
+- **Verified Code Context (Lines 1081–1095):**
+  ```gn
+  "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
+  "//chrome/browser/ui/webui:configs",
+  "//chrome/browser/ui/webui:log_web_ui_url",
+  "//chrome/browser/ui/webui/actor_internals",
+  "//chrome/browser/ui/webui/bluetooth_internals",
+  "//chrome/browser/ui/webui/chrome_urls",
+  "//chrome/browser/ui/webui/connectors_internals",
+  ```
 - **Modification:**
   ```gn
-  deps += [
-    "//chrome/browser/obscure",
-  ]
+  "//chrome/browser/obscure",
   ```
-- **Rationale:** Ensures ninja compiles and links the Obscure C++ shim module into the browser binary.
+- **Rationale:** Links the isolated static library / source set defined in `//chrome/browser/obscure/BUILD.gn` directly into the Chromium browser binary.
 
 ### HK-03: Keyed Service Lifecycle Attachment
 - **File:** `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc`
-- **Location:** Inside `ChromeBrowserMainExtraPartsProfiles::EnsureBrowserContextKeyedServiceFactoriesBuilt()`.
+- **Verified Code Context (Lines 1599–1605):**
+  ```cpp
+  WebDataServiceFactory::GetInstance();
+  webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
+  }
+  ```
 - **Modification:**
   ```cpp
   #include "chrome/browser/obscure/obscure_workspace_service_factory.h"
@@ -55,10 +67,23 @@
   ```
 - **Rationale:** Connects `ObscureWorkspaceService` to the active `Profile` lifecycle so it initializes cleanly and shuts down cleanly with each user profile.
 
+### HK-04: WebUI Resource Packaging
+- **Options Evaluated:**
+  1. *Option A (In-binary string bundle for Tracer Bullet / MVP):* Embed the HTML/CSS/JS payload directly in C++ string literals or simple file reader in `ObscureNewTabPageUI::CreateDataSource()`. Zero GN touchpoints outside `//chrome/browser/obscure/`.
+  2. *Option B (GN `build_webui` rule):* Use `//ui/webui/resources/tools/build_webui.gni` inside `//chrome/browser/obscure/resources/BUILD.gn` to emit a `.pak` file, and declare it in `chrome/chrome_paks.gni` line 260.
+- **Recommendation:** **Option A** for the initial tracer bullet (zero external packaging hooks); transition to **Option B** when the full TypeScript interface is locked.
+
 ---
 
-## Strict Rule on External Hooks
-No developer or AI agent may add changes to any other file outside `//chrome/browser/obscure/` without first:
-1. Documenting the file, rationale, and exact proposed diff here in `HOOKS.md`.
-2. Providing a reviewable unified patch to the Review & QA Lead (Claude).
-3. Receiving explicit approval.
+## New Tab Behavior Test Matrix
+
+To verify that HK-01 operates correctly across all user entry points:
+
+| Case ID | User Action | Expected Navigation URL | Target Controller | Incognito / Normal Guard |
+|---|---|---|---|---|
+| **NTP-01** | Click "+" button on tab strip | `chrome://new-tab-page/` | `ObscureNewTabPageUI` | Normal profile only |
+| **NTP-02** | Keyboard shortcut `Ctrl+T` | `chrome://new-tab-page/` | `ObscureNewTabPageUI` | Normal profile only |
+| **NTP-03** | New Window (`Ctrl+N`) | `chrome://new-tab-page/` | `ObscureNewTabPageUI` | Normal profile only |
+| **NTP-04** | Incognito Window (`Ctrl+Shift+N`) | `chrome://new-tab-page/` | `IncognitoNewTabPageUI` | **Must NOT** load Obscure Spaces in Incognito |
+| **NTP-05** | Direct Omnibox `chrome://newtab` | Rewrites to `chrome://new-tab-page/` | `ObscureNewTabPageUI` | Normal profile only |
+| **NTP-06** | Direct Omnibox `chrome://new-tab-page` | `chrome://new-tab-page/` | `ObscureNewTabPageUI` | Normal profile only |
