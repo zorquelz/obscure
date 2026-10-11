@@ -9,18 +9,21 @@
 
 ### What Works
 - [x] Baseline synchronized and pinned to official **Chromium Stable** tag `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`).
-- [x] GN build configuration generated successfully (`gn gen out/Obscure` passed with 0 errors).
-- [x] Official team roles and governance protocol established.
+- [x] Clean compilation of official Chromium Stable 155 (`54,376` targets) completed with **Exit code 0** in `out/Stable155`.
+- [x] Executable identity verified: `./out/Stable155/chrome --version` reports **`Chromium 155.0.8059.39`**.
+- [x] Sandboxed runtime execution test passed (`--headless=new --dump-dom https://example.com`) without `--no-sandbox`.
+- [x] Rollback baseline preserved intact in `out/Obscure` (Chromium 157.0.8083.0).
+- [x] Official team roles, governance protocol, and 14-day security SLA established.
 - [x] External integration points (`HOOKS.md`) re-derived and verified on Stable 155.
 - [x] Space resilience test plan (`0002-spaces-resilience-and-security.md`) specified.
 
 ### What Does NOT Work Yet (WIP)
-- [ ] Full 56,000-step native compilation on Stable 155 queued (pending initial build test).
 - [ ] No custom Obscure branding or visual theme applied yet.
 - [ ] Project Spaces (tab stashing / session restore) not yet implemented.
 - [ ] WebUI pages (`chrome://obscure-newtab`, `chrome://obscure-settings`) not yet hooked.
 - [ ] Standalone distributable packages (Linux `.deb`/AppImage or Windows `.exe`) not yet built.
 - [ ] Multi-profile storage isolation not yet supported.
+- [ ] Native Windows host build (MSVC) remains unexecuted and unverified.
 
 ---
 
@@ -68,5 +71,5 @@ This repository intentionally **does not** contain the full Chromium source tree
 - **Compilation Environment:** Ubuntu 24.04 LTS (WSL2 `Obscure-Ubuntu`)
 - **Chromium Source Path:** `~/Obscure/chromium/src`
 - **Pinned Upstream Tag:** `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`)
-- **Current Target Build:** `out/Obscure` (`is_debug=false is_component_build=true symbol_level=0`)
+- **Current Target Build:** `out/Stable155` (`is_debug=false is_component_build=true symbol_level=0`)
 - **Target Revenue Milestone:** December 9, 2026 (Founding Supporter validation)
