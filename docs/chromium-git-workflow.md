@@ -126,20 +126,49 @@ git bundle create /mnt/f/Zorquelz/Obscure/backups/obscure-backup-$(date +%Y%m%d_
 git bundle verify /mnt/f/Zorquelz/Obscure/backups/obscure-backup-*.bundle
 ```
 
-### Procedure 2: Safe Branch Rollback
-If an experimental change must be aborted or rewound to the pristine baseline:
+### Procedure 2: Safe Rollback for Control Repository (`f:\Zorquelz\Obscure`)
+Because commits on `feature/pr-1-qa-corrections` are published to the remote origin:
+1. **Primary Safe Rollback via `git revert` (Recommended):**
+   ```bash
+   # 1. Verify working tree is clean
+   git status --short
+   # 2. Create an explicit backup branch reference
+   git branch backup-control-$(date +%Y%m%d_%H%M%S)
+   # 3. Revert specific published commits non-destructively
+   git revert --no-commit HEAD~3..HEAD
+   git commit -m "revert: rollback Stage 1 correction pass commits"
+   git push origin feature/pr-1-qa-corrections
+   ```
+2. **Destructive Local Reset Warning (`git reset --hard`):**
+   - **WARNING:** `git reset --hard` permanently discards uncommitted changes and diverges local history from origin.
+   - **Mandatory Requirements:**
+     1. Verify working tree cleanliness.
+     2. Create an explicit backup branch: `git branch backup-pre-reset-$(date +%Y%m%d_%H%M%S)`.
+     3. Never force-push (`git push --force`) without explicit **Founder & CEO authorization** and QA Lead sign-off.
+     4. Always use `git push --force-with-lease` rather than blind force-push.
+
+### Procedure 3: Safe Rollback for Chromium Source Tree (`~/Obscure/chromium/src`)
+To safely restore the Chromium checkout to the pristine baseline:
 ```bash
 cd ~/Obscure/chromium/src
 
-# 1. Preserve current work on a dated emergency recovery branch
-git branch emergency-backup-$(date +%Y%m%d_%H%M%S)
+# 1. Check working tree cleanliness and inventory untracked files
+git status --short
 
-# 2. Safely rewind development branch to the baseline tag
+# 2. CRITICAL: Commit or stash any uncommitted work.
+# Uncommitted modifications and untracked files will be permanently lost during a reset.
+git add -A
+git commit -m "wip: emergency save before baseline reset" || true
+
+# 3. Create an explicitly named backup branch
+git branch backup-chromium-$(date +%Y%m%d_%H%M%S)
+
+# 4. Safely rewind development branch to the immutable baseline tag
 git checkout obscure-stable-155
 git reset --hard obscure-baseline-155.0.8059.39
 
-# 3. Verify clean state against baseline
+# 5. Verify 100% clean state against baseline
 git status --short
 git diff obscure-baseline-155.0.8059.39 --stat
 ```
-**Guaranteed Result:** Zero code is lost (preserved in bundle and backup branch), while `obscure-stable-155` returns 100% to the verified Stable 155 baseline.
+**Guaranteed Result:** All prior experimental work is preserved safely on `backup-chromium-*`, while `obscure-stable-155` returns 100% to the verified Stable 155 baseline.
