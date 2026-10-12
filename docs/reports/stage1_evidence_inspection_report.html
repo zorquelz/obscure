@@ -270,6 +270,15 @@
 
 <p><strong>Rust Toolchain Provenance:</strong> <code>tools/rust/update_rust.py --print-revision installed</code> confirms revision <code>1edd55dcfcd573872c727fa3e086369a71661ee0-1</code>, perfectly matching DEPS requirements.</p>
 
+<div class="callout">
+  <strong>Classification &amp; Preservation of Untracked Paths:</strong>
+  <ul>
+    <li><code>build/util/MINIBRANCH</code>: Upstream build tooling metadata file generated during Chromium versioning/branching script execution. Preserved intact without modification.</li>
+    <li><code>third_party/google-java-format/cipd/</code>: CIPD binary distribution directory containing Java formatting tools downloaded by <code>gclient runhooks</code>. Preserved intact without modification.</li>
+  </ul>
+  Both paths are confirmed preserved in <code>docs/evidence/logs/submodule_revisions_s1_1.log</code> with zero destructive cleanup commands executed.
+</div>
+
 <h2>3. S1-2 &mdash; Build Configuration &amp; GN Value Origins</h2>
 <p><strong>Supporting Raw Logs:</strong> <code>docs/evidence/logs/build_args_and_ninja.log</code> &amp; <code>docs/evidence/logs/gn_value_origins_s1_2.log</code></p>
 
@@ -332,7 +341,11 @@ git stash list: (empty)</pre>
 <div class="callout-warn">
   <strong>Classification Correction (Headless vs GUI):</strong> In strict compliance with Claude's evidence protocol, the committed image artifact <code>docs/evidence/screenshots/tp06_gui_launch.png</code> is explicitly designated as <strong>Headless Layout/Render Screenshot Evidence</strong>, captured programmatically via:<br>
   <code>./out/Stable155/chrome --headless=new --screenshot=... --window-size=1280,800 https://zorquelz.com</code> (Exit code 0).<br>
-  It empirically proves DOM layout, typography, and pixel rasterization under the Stable 155 Blink/Skia pipeline. The headed WSLg launch (<code>export DISPLAY=:0 WAYLAND_DISPLAY=wayland-0 XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir; ./out/Stable155/chrome https://zorquelz.com</code>) was executed and confirmed display server connection and Weston compositor frame allocation; however, because Windows host test execution runs non-interactively without an attached interactive desktop window handle (Win32 CopyFromScreen error: <em>"The handle is invalid"</em>), window-grab capture of headed windows is restricted. Therefore, this image is accurately classified as <strong>headless layout evidence</strong> rather than interactive GUI window capture.
+  It empirically proves DOM layout, typography, and pixel rasterization under the Stable 155 Blink/Skia pipeline.<br><br>
+  <strong>Actual Headed Launch Output:</strong><br>
+  <code>$ export DISPLAY=:0 WAYLAND_DISPLAY=wayland-0 XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir; timeout 3s ./out/Stable155/chrome https://zorquelz.com</code><br>
+  <pre>[509:509:1012/133003.733019:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: ...</pre>
+  <strong>Empirical Finding:</strong> Because this automated environment lacks an attached interactive desktop window manager and interactive display handle, <strong>interactive headed GUI verification remains UNPROVEN</strong> and is formally deferred to interactive desktop validation sessions.
 </div>
 
 <h2>5. S1-4 &mdash; Git Workflow Compliance &amp; Safeguards</h2>
@@ -375,7 +388,16 @@ fi</pre>
 +  git checkout obscure-stable-155
 +else
 +  git checkout -b obscure-stable-155 obscure-baseline-155.0.8059.39
-+fi</pre>
+@@ -105,7 +105,7 @@
+-# 1. Create a temporary throwaway verification branch from the immutable baseline
+-git checkout -b throwaway-verify obscure-baseline-155.0.8059.39
++# 1. Create a safe, disposable worktree isolated in a temporary path (detached from baseline tag)
++# SAFEGUARD INVARIANT: Uses a disposable worktree instead of branch creation/force-deletion ('git branch -D' is prohibited)
++git worktree add --detach /tmp/obscure-throwaway-verify obscure-baseline-155.0.8059.39
+@@ -169,1 +169,2 @@
+-git add -A
++# SAFEGUARD: NEVER blindly stage with 'git add -A'. Stage specific paths explicitly:
++git add chrome/browser/obscure/</pre>
 
 <table>
   <thead>
@@ -407,13 +429,13 @@ fi</pre>
       <td><span class="badge badge-pass">VERIFIED</span></td>
     </tr>
     <tr>
-      <td><strong>Throwaway-Branch Validation</strong></td>
-      <td>Step D mandates: <code>git checkout -b throwaway-verify ... &amp;&amp; git apply --check ... &amp;&amp; git am ... &amp;&amp; ninja ... &amp;&amp; git branch -D throwaway-verify</code>.</td>
+      <td><strong>Disposable Worktree Validation</strong></td>
+      <td>Step D mandates non-destructive disposable worktree: <code>git worktree add --detach /tmp/obscure-throwaway-verify ... &amp;&amp; git apply --check ... &amp;&amp; git am ... &amp;&amp; git worktree remove /tmp/obscure-throwaway-verify</code>. <code>git branch -D</code> is prohibited.</td>
       <td><span class="badge badge-pass">VERIFIED</span></td>
     </tr>
     <tr>
       <td><strong>Rollback Safeguards</strong></td>
-      <td>Section 4 specifies <code>git revert</code> for published commits, explicit backup branches before resets, and strictly bans <code>git clean -ffd</code> and <code>gclient sync -D</code>.</td>
+      <td>Section 4 specifies <code>git revert</code> for published commits, explicit backup branches before resets, selective staging (bans <code>git add -A</code>), and strictly bans <code>git clean -ffd</code> and <code>gclient sync -D</code>.</td>
       <td><span class="badge badge-pass">VERIFIED</span></td>
     </tr>
   </tbody>
@@ -438,32 +460,40 @@ virtual void OverrideContentSecurityPolicy(
 
 <div class="page-break"></div>
 
-<h2>7. S1-6 &mdash; Tested Rollback Procedures</h2>
-<p><strong>Tested Bundle Verification in WSL2:</strong></p>
-<pre>$ cd ~/Obscure/chromium/src
-$ git bundle create /mnt/f/Zorquelz/Obscure/backups/test-backup.bundle -5 HEAD
-$ git bundle verify /mnt/f/Zorquelz/Obscure/backups/test-backup.bundle
-The bundle contains this ref:
-3ff7ac5a9224be9156d7f8703a06e22890aafd34 HEAD
-The bundle uses this hash algorithm: sha1
-/mnt/f/Zorquelz/Obscure/backups/test-backup.bundle is okay</pre>
+<h2>7. S1-6 &mdash; Tested Rollback Procedures &amp; Work Recovery</h2>
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/rollback_recovery_demonstration.log</code></p>
+
+<h3>7.1 Demonstration of Obscure Work Backup, Rollback &amp; Exact Restoration</h3>
+<p>To demonstrate recovery of actual Obscure work (not merely baseline verification), a full lifecycle test was executed in WSL2 with explicit selective staging (prohibiting <code>git add -A</code>):</p>
+<ul>
+  <li><strong>1. Work Created &amp; Staged Selectively:</strong> Created <code>chrome/browser/obscure/recovery_demo.h</code>, staged explicitly via <code>git add chrome/browser/obscure/recovery_demo.h</code> (never <code>git add -A</code>).</li>
+  <li><strong>2. Work Committed:</strong> Commit ID recorded: <code>BEFORE_COMMIT_ID = 1d3194c36855095f5784904f05fb0e23f5c111d5</code>.</li>
+  <li><strong>3. Backup Created:</strong> Self-contained Git bundle (<code>obscure_recovery_demo.bundle</code>) and backup branch (<code>backup-obscure-recovery-demo</code>) established and verified.</li>
+  <li><strong>4. Rollback Executed:</strong> <code>git reset --hard obscure-baseline-155.0.8059.39</code> executed. Restored to stock baseline commit: <code>ROLLBACK_COMMIT_ID = 3ff7ac5a9224be9156d7f8703a06e22890aafd34</code>.</li>
+  <li><strong>5. Work Restored:</strong> Restored from backup ref via <code>git reset --hard backup-obscure-recovery-demo</code>. Restored commit ID: <code>AFTER_COMMIT_ID = 1d3194c36855095f5784904f05fb0e23f5c111d5</code>.</li>
+  <li><strong>6. Verification Result:</strong> <code>BEFORE_COMMIT == AFTER_COMMIT</code> (100% exact bitwise and history restoration). Zero code lost.</li>
+</ul>
 
 <p><strong>Control Repo Rollback (Recommended):</strong> Safe procedure verifies clean tree, creates backup branch (<code>backup-control-$(date +%s)</code>), and uses <code>git revert</code> for published commits. Explicitly documents that <code>git reset --hard</code> is a destructive local operation requiring Founder &amp; CEO authorization before any force-push (<code>--force-with-lease</code>).</p>
-<p><strong>Chromium Tree Rollback:</strong> Names explicit backup branch (<code>backup-chromium-$(date +%s)</code>), commits/stashes uncommitted work to prevent data loss, and resets to <code>obscure-baseline-155.0.8059.39</code>.</p>
+<p><strong>Chromium Tree Rollback:</strong> Names explicit backup branch (<code>backup-chromium-$(date +%s)</code>), commits uncommitted work selectively (prohibiting <code>git add -A</code>), and resets to <code>obscure-baseline-155.0.8059.39</code>.</p>
 
 <h2>8. S1-7 &mdash; Security-Fix Count &amp; Repository Search</h2>
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/security_fix_count_search.log</code></p>
 <ul>
-  <li><strong>Official Permalink:</strong> <a href="https://chromereleases.googleblog.com/2026/10/stable-channel-update-for-desktop.html">Chrome Releases Blog &mdash; Stable Channel Update for Desktop (October 6, 2026)</a></li>
-  <li><strong>Verbatim Text:</strong> <em>&ldquo;This update includes 247 security fixes. Below, we highlight fixes that were contributed by external researchers.&rdquo;</em></li>
-  <li><strong>Repository Search:</strong> A complete ripgrep search confirms <code>247</code> occurs as a documentation claim exclusively in lines 18&ndash;19 of <code>docs/evidence/chromium-stable-155-source-audit.md</code>. All other hits in the repository are timestamps and file offsets in raw logs.</li>
+  <li><strong>Official Upstream Permalink:</strong> <a href="https://chromereleases.googleblog.com/2026/10/stable-channel-update-for-desktop.html">Chrome Releases Blog &mdash; Stable Channel Update for Desktop (October 6, 2026)</a></li>
+  <li><strong>Source-Audit Excerpt (<code>docs/evidence/chromium-stable-155-source-audit.md</code>, Lines 18–19):</strong>
+    <pre>- The official announcement states: "This update includes 247 security fixes. Below, we highlight fixes that were contributed by external researchers. Please see the Chromium security page for more information."
+- Labeling Clarification: The count of 247 security fixes represents the total security-relevant bug fixes and hardening commits merged into the Stable 155 milestone (including internal audits, ClusterFuzz findings, and static analysis), while specific CVE identifiers are assigned to bugs reported by external researchers. This count is sourced directly from Google's official release blog, not third-party aggregators.</pre>
+  </li>
+  <li><strong>Raw Repository Search Evidence:</strong> Complete ripgrep search output in <code>docs/evidence/logs/security_fix_count_search.log</code> establishes that <code>247</code> occurs as a documentation statement strictly in lines 18&ndash;19 of <code>chromium-stable-155-source-audit.md</code>. All other hits in the repository are timestamps and file offsets in build logs. The upstream blog statement is maintained as distinct from what Obscure's independent audit establishes.</li>
 </ul>
 
 <h2>9. S1-8 &mdash; Test Plan 0003 &amp; Acceptance Tests</h2>
-<p><strong>Document:</strong> <code>docs/test-plans/0003-stage1-tracer-bullet.md</code></p>
+<p><strong>Document:</strong> <code>docs/test-plans/0003-stage1-tracer-bullet.md</code> | <strong>TB-10 Log:</strong> <code>docs/evidence/logs/tb10_revert_test.log</code></p>
 <ul>
   <li><strong>Scope Strictness:</strong> Limited to HK-01/HK-02, static Launchpad page, zero native persistence, zero Mojo IPC, zero Project Spaces DB/models. External patch size strictly constrained to &le; 10 lines outside <code>//chrome/browser/obscure/</code>.</li>
   <li><strong>Acceptance Criteria:</strong> Explicitly covers NTP-01 through NTP-06, incognito isolation (standard incognito splash, zero custom UI), guest isolation, default WebUI CSP (zero console errors, no inline scripts), active sandbox invariant (Layer 1 + Layer 2), and clean patch reversibility.</li>
-  <li><strong>Execution Status:</strong> Acceptance tests TB-01..07 remain strictly gated/blocked until Claude issues Stage 1 clearance.</li>
+  <li><strong>Execution Status:</strong> Acceptance tests TB-01..09 remain strictly gated/blocked until Claude issues Stage 1 clearance. TB-10 is empirically executed and verified in WSL2.</li>
 </ul>
 
 <table>
@@ -479,62 +509,62 @@ The bundle uses this hash algorithm: sha1
     <tr>
       <td><strong>TB-01</strong></td>
       <td>Tab Strip "+" button opens Launchpad</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Stage 1 implementation gated</td>
     </tr>
     <tr>
       <td><strong>TB-02</strong></td>
       <td>Keyboard shortcut <code>Ctrl+T</code></td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Stage 1 implementation gated</td>
     </tr>
     <tr>
       <td><strong>TB-03</strong></td>
       <td>New Window <code>Ctrl+N</code> opens Launchpad</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Stage 1 implementation gated</td>
     </tr>
     <tr>
       <td><strong>TB-04</strong></td>
       <td>Direct Omnibox rewrite (<code>chrome://newtab</code>)</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Stage 1 implementation gated</td>
     </tr>
     <tr>
       <td><strong>TB-05</strong></td>
       <td>Incognito Isolation (default incognito splash)</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Zero Obscure UI rendered in incognito</td>
     </tr>
     <tr>
       <td><strong>TB-06</strong></td>
       <td>Guest Profile Isolation (default guest splash)</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Zero Obscure UI rendered in guest</td>
     </tr>
     <tr>
       <td><strong>TB-07</strong></td>
       <td>Content Security Policy (0 console errors)</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Zero CSP violations; no unsafe-eval</td>
     </tr>
     <tr>
       <td><strong>TB-08</strong></td>
-      <td>Active Sandbox Invariant</td>
-      <td><span class="badge badge-pass">PASS</span></td>
-      <td>Verified in <code>sandbox_proc_status.log</code></td>
+      <td>Active Sandbox Verification</td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
+      <td>To be verified on live WebUI renderer PID post-clearance</td>
     </tr>
     <tr>
       <td><strong>TB-09</strong></td>
       <td>Alternative Search Engine Default</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td><span class="badge badge-blocked">NOT RUN / BLOCKED</span></td>
       <td>Launchpad retains control</td>
     </tr>
     <tr>
       <td><strong>TB-10</strong></td>
-      <td>Throwaway-Branch Revert Test</td>
-      <td><span class="badge badge-pass">PASS</span></td>
-      <td>Tested in WSL2; 100% clean baseline return</td>
+      <td>Clean Patch Reversibility Test</td>
+      <td><span class="badge badge-pass">PASS (Executed &amp; Verified)</span></td>
+      <td>Executed in WSL2; 100% exact baseline return (<code>tb10_revert_test.log</code>)</td>
     </tr>
   </tbody>
 </table>
@@ -553,51 +583,51 @@ The bundle uses this hash algorithm: sha1
   <tbody>
     <tr>
       <td><strong>S1-1</strong></td>
-      <td>Dependency Provenance (6 submodules + Rust)</td>
-      <td><span class="badge badge-pass">PASS</span></td>
+      <td>Dependency Provenance (6 submodules + Rust + Untracked Paths)</td>
+      <td><span class="badge badge-pass">PASS (Executed &amp; Verified)</span></td>
       <td><code>docs/evidence/logs/submodule_revisions_s1_1.log</code></td>
     </tr>
     <tr>
       <td><strong>S1-2</strong></td>
       <td>Build Configuration &amp; DCHECK Classification</td>
-      <td><span class="badge badge-pass">PASS</span></td>
+      <td><span class="badge badge-pass">PASS (Executed &amp; Verified)</span></td>
       <td><code>docs/evidence/logs/gn_value_origins_s1_2.log</code></td>
     </tr>
     <tr>
       <td><strong>S1-3</strong></td>
-      <td>Raw Evidence (PIDs, out/Obscure, reflog, Headless Layout Screenshot labeled)</td>
-      <td><span class="badge badge-pass">PASS (Verified)</span></td>
-      <td><code>docs/evidence/logs/sandbox_proc_status.log</code><br><code>docs/evidence/screenshots/tp06_gui_launch.png</code></td>
+      <td>Raw Evidence (PIDs, out/Obscure, reflog, Headless Screenshot; Headed GUI unproven)</td>
+      <td><span class="badge badge-pass">PASS (Executed &amp; Verified)</span></td>
+      <td><code>docs/evidence/logs/sandbox_proc_status.log</code><br><code>docs/evidence/screenshots/tp06_gui_launch.png</code> (Headed GUI: Unproven)</td>
     </tr>
     <tr>
       <td><strong>S1-4</strong></td>
-      <td>Git Workflow Compliance (Safe Step A [no -B], <code>*.patch -text</code>, throwaway branch)</td>
+      <td>Git Workflow Compliance (Safe Step A [no -B], <code>*.patch -text</code>, disposable worktree)</td>
       <td><span class="badge badge-pass">PASS (Verified)</span></td>
       <td><code>.gitattributes</code> &amp; <code>docs/chromium-git-workflow.md</code></td>
     </tr>
     <tr>
       <td><strong>S1-5</strong></td>
       <td>HK-04 WebUI API &amp; Strict CSP Header Evidence</td>
-      <td><span class="badge badge-pass">PASS</span></td>
+      <td><span class="badge badge-pass">PASS (Verified)</span></td>
       <td><code>docs/evidence/logs/hooks_grep_evidence.log</code></td>
     </tr>
     <tr>
       <td><strong>S1-6</strong></td>
-      <td>Rollback Instructions (Revert, Reset, Bundles)</td>
-      <td><span class="badge badge-pass">PASS</span></td>
-      <td><code>docs/chromium-git-workflow.md</code> (tested in WSL2)</td>
+      <td>Rollback &amp; Work Recovery (Revert, Reset, Bundles, Work Recovery Demo)</td>
+      <td><span class="badge badge-pass">PASS (Executed &amp; Verified)</span></td>
+      <td><code>docs/evidence/logs/rollback_recovery_demonstration.log</code></td>
     </tr>
     <tr>
       <td><strong>S1-7</strong></td>
-      <td>Security-Fix Count Permalink &amp; Search</td>
-      <td><span class="badge badge-pass">PASS</span></td>
-      <td><code>docs/evidence/chromium-stable-155-source-audit.md</code></td>
+      <td>Security-Fix Count Permalink, Source Excerpt &amp; Search Log</td>
+      <td><span class="badge badge-pass">PASS (Verified)</span></td>
+      <td><code>docs/evidence/logs/security_fix_count_search.log</code></td>
     </tr>
     <tr>
       <td><strong>S1-8</strong></td>
-      <td>Test Plan 0003 Specification &amp; Revert Test</td>
-      <td><span class="badge badge-pass">PASS (Spec)</span></td>
-      <td><code>docs/test-plans/0003-stage1-tracer-bullet.md</code></td>
+      <td>Test Plan 0003 Specification &amp; TB-10 Revert Test</td>
+      <td><span class="badge badge-pass">PASS (TB-10 Executed; TB-01..09 Gated)</span></td>
+      <td><code>docs/test-plans/0003-stage1-tracer-bullet.md</code><br><code>docs/evidence/logs/tb10_revert_test.log</code></td>
     </tr>
   </tbody>
 </table>

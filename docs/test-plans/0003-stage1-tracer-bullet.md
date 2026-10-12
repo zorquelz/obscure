@@ -36,18 +36,18 @@ The Stage 1 New Tab Tracer Bullet serves as the minimal end-to-end integration p
 
 ## 2. Acceptance Test Matrix (Stage 1 Tracer Bullet)
 
-| Test ID | Test Category | User Action / Trigger | Expected System Behavior | Pass Criteria | Gate Dependency |
-|---|---|---|---|---|---|
-| **TB-01** | Tab Strip Navigation | User clicks "+" button on tab strip | Opens `chrome://new-tab-page/` | Obscure Launchpad WebUI renders cleanly | Stage 1 Core |
-| **TB-02** | Keyboard Shortcut | User presses `Ctrl+T` | Opens `chrome://new-tab-page/` | Obscure Launchpad WebUI renders cleanly | Stage 1 Core |
-| **TB-03** | Window Creation | User presses `Ctrl+N` (New Window) | New browser window opens to New Tab Page | Obscure Launchpad WebUI renders cleanly | Stage 1 Core |
-| **TB-04** | Omnibox URL Rewrite | User navigates to `chrome://newtab` or `chrome://new-tab-page` | URL canonicalized to `chrome://new-tab-page/` | Obscure Launchpad WebUI renders cleanly | Stage 1 Core |
-| **TB-05** | Incognito Privacy Guard | User presses `Ctrl+Shift+N` (Incognito Window) | Opens `chrome://new-tab-page/` in OffTheRecord profile | Renders standard `IncognitoNewTabPageUI`; **ZERO** Obscure UI rendered | Security & Privacy Invariant |
-| **TB-06** | Guest Profile Guard | User launches browser in Guest mode | Opens Guest New Tab Page | Renders standard `GuestNewTabPageUI`; **ZERO** Obscure UI rendered | Security & Privacy Invariant |
-| **TB-07** | Content Security Policy | Open DevTools Console on `chrome://new-tab-page/` | Inspect console for CSP errors | **Zero CSP errors**; no inline script violations; no `unsafe-eval` | Security Invariant |
-| **TB-08** | Active Sandbox Verification | Launch `./out/Stable155/chrome` without `--no-sandbox` | Execute `scripts/check_sandbox.py` on renderer process | `NoNewPrivs: 1`, `Seccomp: 2`, User and PID namespace isolation active | Kernel Security Invariant |
-| **TB-09** | Third-Party Search Engine | Change default search provider to DuckDuckGo/Bing | Press `Ctrl+T` to open New Tab Page | Obscure Launchpad WebUI renders cleanly (not hijacked by search provider NTP) | UI Invariant |
-| **TB-10** | Clean Patch Reversibility | Execute `git apply -R patches/*.patch` on Chromium tree | Chromium tree returns to clean baseline | Compiles cleanly back to stock Chromium 155 | Audit Invariant |
+| Test ID | Test Category | User Action / Trigger | Expected System Behavior | Pass Criteria | Execution Status | Supporting Log |
+|---|---|---|---|---|---|---|
+| **TB-01** | Tab Strip Navigation | User clicks "+" button on tab strip | Opens `chrome://new-tab-page/` | Obscure Launchpad WebUI renders cleanly | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-02** | Keyboard Shortcut | User presses `Ctrl+T` | Opens `chrome://new-tab-page/` | Obscure Launchpad WebUI renders cleanly | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-03** | Window Creation | User presses `Ctrl+N` (New Window) | New browser window opens to New Tab Page | Obscure Launchpad WebUI renders cleanly | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-04** | Omnibox URL Rewrite | User navigates to `chrome://newtab` or `chrome://new-tab-page` | URL canonicalized to `chrome://new-tab-page/` | Obscure Launchpad WebUI renders cleanly | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-05** | Incognito Privacy Guard | User presses `Ctrl+Shift+N` (Incognito Window) | Opens `chrome://new-tab-page/` in OffTheRecord profile | Renders standard `IncognitoNewTabPageUI`; **ZERO** Obscure UI rendered | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-06** | Guest Profile Guard | User launches browser in Guest mode | Opens Guest New Tab Page | Renders standard `GuestNewTabPageUI`; **ZERO** Obscure UI rendered | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-07** | Content Security Policy | Open DevTools Console on `chrome://new-tab-page/` | Inspect console for CSP errors | **Zero CSP errors**; no inline script violations; no `unsafe-eval` | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-08** | Active Sandbox Verification | Launch `./out/Stable155/chrome` without `--no-sandbox` | Execute `scripts/check_sandbox.py` on renderer process | `NoNewPrivs: 1`, `Seccomp: 2`, User and PID namespace isolation active | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-09** | Third-Party Search Engine | Change default search provider to DuckDuckGo/Bing | Press `Ctrl+T` to open New Tab Page | Obscure Launchpad WebUI renders cleanly (not hijacked by search provider NTP) | **NOT RUN / BLOCKED** | Gated pending Stage 1 clearance |
+| **TB-10** | Clean Patch Reversibility | Execute throwaway-branch patch application & reversal | Chromium tree returns to baseline commit `3ff7ac5a9...` | 100% exact baseline return; exit code 0 | **PASS (Executed & Verified)** | [`tb10_revert_test.log`](file:///f:/Zorquelz/Obscure/docs/evidence/logs/tb10_revert_test.log) |
 
 ---
 

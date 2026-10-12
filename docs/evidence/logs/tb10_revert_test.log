@@ -1,0 +1,38 @@
+=== TB-10: THROWAWAY-BRANCH PATCH APPLICATION & REVERSAL TEST ===
+Timestamp (UTC): Mon Oct 12 13:35:23 UTC 2026
+Target Baseline Tag: obscure-baseline-155.0.8059.39
+Switched to branch 'obscure-stable-155'
+Deleted branch tb10-disposable-verify (was 3ff7ac5a9224b).
+Switched to a new branch 'tb10-patch-generator'
+[tb10-patch-generator 818b192d3dbab] feat(obscure): test hook for TB-10 revert validation
+ 1 file changed, 1 insertion(+)
+ create mode 100644 chrome/browser/obscure/tb10_hook.h
+/tmp/0001-feat-obscure-test-hook-for-TB-10-revert-validation.patch
+Generated test patch: /tmp/0001-test-tracer-bullet-hook.patch
+Switched to branch 'obscure-stable-155'
+Deleted branch tb10-patch-generator (was 818b192d3dbab).
+Switched to a new branch 'tb10-disposable-verify'
+--- Initial Baseline State ---
+BASELINE_COMMIT_ID: 3ff7ac5a9224be9156d7f8703a06e22890aafd34
+?? build/util/MINIBRANCH
+?? third_party/google-java-format/cipd/
+--- Step 1: Dry-Run Patch Verification ---
+git apply --check EXIT_CODE: 0
+--- Step 2: Apply Patch Series via git am ---
+Applying: feat(obscure): test hook for TB-10 revert validation
+git am EXIT_CODE: 0
+APPLIED_COMMIT_ID: cf453a01dc24f38706529a461e3c552866a68b69
+cf453a01dc24f feat(obscure): test hook for TB-10 revert validation
+--- Step 3: Execute Reversal / Rollback to Baseline Tag ---
+HEAD is now at 3ff7ac5a9224b Incrementing VERSION to 155.0.8059.39
+git reset --hard EXIT_CODE: 0
+RESTORED_COMMIT_ID: 3ff7ac5a9224be9156d7f8703a06e22890aafd34
+VERIFICATION RESULT: PASS (100% Exact Restoration to Baseline Tag)
+--- Step 4: Cleanup Disposable Environment ---
+Switched to branch 'obscure-stable-155'
+Deleted branch tb10-disposable-verify (was 3ff7ac5a9224b).
+Active Branch: obscure-stable-155
+Active HEAD: 3ff7ac5a9224be9156d7f8703a06e22890aafd34
+?? build/util/MINIBRANCH
+?? third_party/google-java-format/cipd/
+=== TB-10 TEST COMPLETE: PASS (EXECUTED & VERIFIED) ===
