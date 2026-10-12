@@ -5,71 +5,83 @@
 
 ---
 
-## 1. Current Status (As of October 11, 2026)
+## 1. Project Status & Gate Enforcement (As of October 12, 2026)
 
-### What Works
-- [x] Baseline synchronized and pinned to official **Chromium Stable** tag `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`).
-- [x] Clean compilation of official Chromium Stable 155 (`54,376` targets) completed with **Exit code 0** in `out/Stable155`.
-- [x] Executable identity verified: `./out/Stable155/chrome --version` reports **`Chromium 155.0.8059.39`**.
-- [x] Sandboxed runtime execution test passed (`--headless=new --dump-dom https://example.com`) without `--no-sandbox`.
-- [x] Rollback baseline preserved intact in `out/Obscure` (Chromium 157.0.8083.0).
-- [x] Official team roles, governance protocol, and 14-day security SLA established.
-- [x] External integration points (`HOOKS.md`) re-derived and verified on Stable 155.
-- [x] Space resilience test plan (`0002-spaces-resilience-and-security.md`) specified.
+### Two-Stage Development Gate (CEO & QA Mandate)
+- **Stage 1 — New Tab Tracer Bullet:** **BLOCKED** until all discrepancy evidence is reviewed and approved by Review & QA Lead (Claude) and the CEO.
+- **Stage 2 — Project Spaces Persistence:** **BLOCKED** until persistence contract, flush policy, test plan 0002, and unit tests are reviewed and approved by Claude and the CEO.
+- **Current Phase:** Stable Baseline QA Closure & Verification Package Delivery (Mission A & B).
 
-### What Does NOT Work Yet (WIP)
-- [ ] No custom Obscure branding or visual theme applied yet.
-- [ ] Project Spaces (tab stashing / session restore) not yet implemented.
-- [ ] WebUI pages (`chrome://obscure-newtab`, `chrome://obscure-settings`) not yet hooked.
-- [ ] Standalone distributable packages (Linux `.deb`/AppImage or Windows `.exe`) not yet built.
-- [ ] Multi-profile storage isolation not yet supported.
-- [ ] Native Windows host build (MSVC) remains unexecuted and unverified.
+### Verified Milestones (What Works)
+- [x] **Upstream Stable Pinned:** Pinned to official Chromium Desktop Stable release tag `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`).
+- [x] **Stable 155 Monolithic Compilation:** Full compilation (`54,376` targets) completed with **Exit code 0** in `out/Stable155`.
+- [x] **Executable Verification:** `./out/Stable155/chrome --version` reports **`Chromium 155.0.8059.39`**.
+- [x] **Live Kernel Sandbox Evidence:** Verified via `scripts/check_sandbox.py` on live renderer PID without `--no-sandbox`:
+  - `NoNewPrivs: 1`
+  - `Seccomp: 2` (`SECCOMP_MODE_FILTER`)
+  - Isolated User Namespace (`user:[4026532295]`)
+  - Isolated PID Namespace (`pid:[4026532228]`)
+- [x] **Non-Component Build Target:** `out/Release155` generated via GN (`is_component_build=false, symbol_level=0`) with smoke test verified (`libversion_info.a`, exit code 0).
+- [x] **Rollback Baselines Preserved:** Both `out/Obscure` (Chromium 157.0.8083.0) and `out/Stable155` remain intact.
+- [x] **Git Workflow Corrected:** Pinned baseline tag `obscure-baseline-155.0.8059.39`, `git format-patch` series, `git bundle` safe backups, and `.gitattributes` LF line ending normalization.
+- [x] **Comprehensive Test Plans:**
+  - `docs/test-plans/0001-baseline-linux-wsl-verification.md` (v2.0 Stable Baseline & `/proc` evidence).
+  - `docs/test-plans/0002-spaces-resilience-and-security.md` (v2.0 URL allowlisting, Mojo IPC validation, 10 MB cap, corruption recovery, Incognito/Guest isolation, NTP matrix).
+- [x] **Governance & Security SLA:** 14-calendar-day security rebase SLA from upstream Linux GA, dual approval gate (CEO + Claude QA), and public advisory contingency policy committed in ADR 0002.
+
+### What Does NOT Work Yet (Pending Gate Clearance)
+- [ ] Obscure New Tab WebUI frontend (Stage 1 Gate Blocked).
+- [ ] Project Spaces persistence shim (Stage 2 Gate Blocked).
+- [ ] Standalone distributable packages (Linux `.deb`/AppImage or Windows `.exe`).
+- [ ] Native Windows host compilation (MSVC) remains unexecuted and unverified.
 
 ---
 
-## 2. Team Roster & Operating Model
+## 2. Team Roster & Operating Governance
 
-| Member | Official Position | Responsibility |
+| Member | Official Role | Core Responsibility |
 |---|---|---|
-| **Founder** | **Founder & CEO** | Product vision, business priorities, feature approval, final tie-breaker. |
-| **ChatGPT** | **Chief Architect & Technical Strategy Lead** | High-level system design, strategic trade-offs, architecture briefs. |
-| **Antigravity** | **Engineering & Implementation Lead** | Hands-on code, patches, WebUI/C++ shims, build execution, PR author. |
-| **Claude** | **Review & QA Lead** | Code review, diff audits, security verification, test plan approvals. |
+| **Founder** | **Founder & CEO** | Product vision, business priorities, feature approval, gate sign-off, tie-breaker. |
+| **ChatGPT** | **Chief Architect & Technical Strategy Lead** | High-level system architecture, strategic boundaries, governance briefs. |
+| **Antigravity** | **Engineering & Implementation Lead** | Source inspection, native C++ shims, WebUI, build execution, test logs, PR author. |
+| **Claude** | **Review & QA Lead** | Code review, diff audits, security verification, test plan gates, sign-off. |
 
 ### Collaboration Rules of Engagement
-1. **No direct commits to main:** Implementation happens via feature branches and Pull Requests.
-2. **Review before land:** Every non-trivial change must present an explicit `git diff` and a verified revert command for Claude's review.
-3. **Evidence-based decisions:** Disputes regarding security or data integrity are resolved with tests, logs, or Chromium source references, not speculation.
-4. **Decisions in Repo:** Architectural conclusions are committed under `docs/decisions/` (ADRs).
-5. **Security SLA:** Tested security updates within 14 calendar days of upstream Chromium Stable releases.
+1. **Two-Stage Gate Enforcement:** No tracer bullet or feature implementation begins until its respective gate is cleared by Claude and the CEO.
+2. **No Direct Commits to Main:** Implementation occurs on dedicated feature branches and Pull Requests.
+3. **Evidence-Based Dispute Resolution:** All claims regarding security, memory, or persistence must reference source files, line numbers, command logs, or test scripts.
+4. **Permanent Record in Repo:** Architectural and governance conclusions are permanently tracked in `docs/decisions/` (ADRs).
+5. **Security Dual-Approval:** Upstream version upgrades and security-sensitive shims require both CEO approval and Claude QA sign-off.
 
 ---
 
 ## 3. Repository Layout
 
-This repository intentionally **does not** contain the full Chromium source tree (~80GB). It contains our custom code, patches, architecture decisions, and tooling:
-
 ```text
 .
+├── .gitattributes       # Normalizes line endings (LF) for clean patch application
+├── HOOKS.md             # Re-derived external Chromium integration points (HK-01 to HK-05)
+├── README.md            # Project dashboard, status tracking, and governance
 ├── docs/
-│   ├── decisions/       # Architecture Decision Records (ADRs)
-│   ├── test-plans/      # QA & test verification procedures
-│   ├── evidence/        # Real source-tree audits & command logs
-│   └── specs/           # Feature and UI/UX specifications
+│   ├── decisions/       # ADR 0001 (Governance), ADR 0002 (Architecture & Persistence)
+│   ├── test-plans/      # TP 0001 (Baseline Verification), TP 0002 (Resilience & Security)
+│   ├── evidence/        # Empirical source audits, logs, sandbox inspection reports
+│   └── chromium-git-workflow.md # Git branch, patch export, bundle backup, and rollback rules
 ├── src/
-│   ├── webui/           # Obscure WebUI frontends (New Tab, Settings, Drawer)
-│   └── native/          # Isolated C++ shim files (//chrome/browser/obscure/)
-├── patches/             # Unified .patch files applied cleanly over upstream Chromium
-└── scripts/             # Build automation, sync helpers, and packaging scripts
+│   ├── webui/           # Obscure WebUI frontends (Launchpad New Tab, Settings)
+│   └── native/          # Canonical C++ shim sources (//chrome/browser/obscure/)
+├── patches/             # Unified per-commit .patch files exported via git format-patch
+└── scripts/             # Sandbox inspector, build helpers, and verification harnesses
 ```
 
 ---
 
-## 4. Development Baseline
+## 4. Development Baseline Environment
 
-- **Host Machine:** Windows 11 (AMD Ryzen 9 9900X, 32GB RAM)
+- **Host Machine:** Windows 11 Pro (AMD Ryzen 9 9900X 12-Core, 32GB RAM)
 - **Compilation Environment:** Ubuntu 24.04 LTS (WSL2 `Obscure-Ubuntu`)
 - **Chromium Source Path:** `~/Obscure/chromium/src`
 - **Pinned Upstream Tag:** `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`)
-- **Current Target Build:** `out/Stable155` (`is_debug=false is_component_build=true symbol_level=0`)
+- **Local Immutable Tag:** `obscure-baseline-155.0.8059.39`
+- **Active Compilation Directory:** `out/Stable155` (`is_debug=false`, monolithic non-component)
 - **Target Revenue Milestone:** December 9, 2026 (Founding Supporter validation)

@@ -1,15 +1,15 @@
 # ADR 0002: MVP Scope, WebUI Architecture, and Persistence Specification
 
 ## Status
-Proposed (Pending Independent QA Audit and CEO Approval)
+Proposed (Awaiting Claude QA Audit & CEO Stage 2 Gate Clearance)
 
 ## Date
-2026-10-11
+2026-10-12 (Revision 2.0 — QA Correction Baseline)
 
 ## Context
-Modifying Chromium's native C++ Views directly creates severe maintenance risks, slow compilation cycles, and upstream merge conflicts. To deliver a functional, resilient product by December 9, 2026 on a ₹0 budget, Obscure must strictly isolate custom logic, prune extraneous scope, and establish bulletproof local persistence.
+Modifying Chromium's native C++ Views directly creates severe maintenance risks, slow compilation cycles, and upstream merge conflicts. To deliver a functional, resilient product on a ₹0 budget, Obscure must strictly isolate custom logic, prune extraneous scope, and establish resilient, corruption-resistant local persistence.
 
-Following executive review, **Public Obscure will use Chromium Stable only**. Pre-stable trunk is rejected as a baseline. The project is pinned to official Stable release tag `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`).
+Following executive review and CEO directive, **Public Obscure uses official Chromium Stable only**. Pre-stable trunk has been rejected as a baseline. The project is pinned to official Stable release tag `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`).
 
 ---
 
@@ -17,64 +17,87 @@ Following executive review, **Public Obscure will use Chromium Stable only**. Pr
 
 ### 1. Target Audience & Scope Pruning
 - **Sole Target Audience for MVP:** Independent developers and indie hackers managing local servers (`localhost`), APIs, and web dashboards.
-- **Explicit Exclusions:** Everyday general consumers, AI services, cloud accounts, proprietary sync infrastructure, and deep penetration testing suites are strictly excluded from v1.0.
+- **Explicit Exclusions:** Everyday general consumers, AI services, cloud accounts, proprietary sync infrastructure, and penetration testing suites are strictly excluded from v1.0.
 
 ### 2. Upstream Stable Baseline & Security SLA
 - **Stable-Only Baseline:** All public releases and development builds track official Chromium Stable tags.
-- **14-Day Security SLA:** Public Obscure commits to shipping a tested security update within **14 calendar days** of an applicable upstream Chromium Stable security release.
-- **Dual Approval Gate:** Any security-sensitive change or dependency upgrade requires both CEO approval and Claude's independent QA sign-off.
+- **14-Day Security SLA:** Public Obscure commits to shipping a tested security update within **14 calendar days** of an applicable upstream Chromium Stable security release reaching General Availability (GA) on Linux.
+- **Contingency if SLA is Missed:** If an upstream security update cannot be shipped within 14 calendar days due to unexpected upstream compiler regressions or ABI breaks:
+  1. A public security advisory will be published on `zorquelz.com/obscure/security/advisories`.
+  2. The advisory will enumerate the affected upstream CVEs and severity ratings.
+  3. Actionable temporary user mitigations will be provided.
+  4. An updated delivery ETA will be published.
+- **Dual Approval Gate:** Any security-sensitive change, dependency upgrade, or upstream rebase requires both CEO approval and Claude's independent QA sign-off.
 
-### 3. Cookie & Session Storage Policy (No False Claims)
-- **Shared Session Context in v1.0:** In v1.0, Project Spaces implement **visual and tab stashing**, not hard multi-profile `StoragePartition` isolation. Tabs across different spaces share the active profile's cookie jar and local storage.
+### 3. Cookie & Session Storage Policy (Accurate Disclosure)
+- **Shared Session Context:** In v1.0, Project Spaces implement **visual and tab stashing**, not hard multi-profile `StoragePartition` isolation. Tabs across different spaces share the active profile's cookie jar and local storage.
 - **Marketing & UI Ban:** No documentation, marketing, or UI element may claim "container isolation" or "cookie isolation" in v1.0.
-- **Mandatory UI Disclosure:** When a user creates or opens a Space, the UI must display a clear, plain-language transparency notice:
-  > *"Tabs in this space share your active session cookies with other spaces. Full storage container isolation is coming in v1.1."*
+- **Mandatory UI Transparency Disclosure:** When a user creates or opens a Space, the UI must display a clear, plain-language transparency notice:
+  > *"Tabs in this space share your active session cookies and local storage with other spaces within this profile. Container/partition-level storage isolation is not supported in this version."*
+  *(Speculative promises of specific future release versions such as "coming in v1.1" are prohibited).*
 
 ### 4. WebUI Integration Layer
-- **Architecture:** Obscure's New Tab Page / Launchpad will be implemented as a modern WebUI page served via Chromium's native WebUI data source.
+- **Architecture:** Obscure's New Tab Page / Launchpad is implemented as a WebUI page served via Chromium's native WebUI data source pipeline (`content::WebUIDataSource`).
+- **Tech Stack:** Chromium standard WebUI frontend pipeline (HTML, CSS, and TypeScript compiled via GN `build_webui()`).
 - **Registration Mechanism:** Registered via `content::WebUIConfigMap::GetInstance().AddWebUIConfig()` inside `chrome/browser/ui/webui/chrome_web_ui_configs.cc` (substituting `NewTabPageUIConfig` on `chrome::kChromeUINewTabPageHost`, line 333 in Stable 155).
 - **External Touchpoints:** Strictly governed by `HOOKS.md`.
 
 ### 5. Persistence Architecture (`ObscureWorkspaceService`)
 - **Storage Location:** Workspace state must be stored inside the user's active Chromium profile directory:
   `profile->GetPath().Append(FILE_PATH_LITERAL("obscure_spaces.json"))`.
-  Hardcoded paths outside the profile are strictly banned.
+  Hardcoded paths outside the profile directory are strictly forbidden.
+- **Off-The-Record (Incognito & Guest) Invariant:**
+  - `ObscureWorkspaceServiceFactory::GetBrowserContextToUse()` returns `nullptr` for OffTheRecord (OTR) / Incognito / Guest contexts.
+  - Ephemeral contexts must **never** create `obscure_spaces.json` on disk or persist state.
+- **File-Size Cap (DoS Prevention):**
+  - Reading and parsing is strictly capped at **10 MB** (`kMaxSpacesFileSize = 10 * 1024 * 1024` bytes) via `base::ReadFileToStringWithMaxSize`.
+  - Any file exceeding 10 MB is rejected before parsing to prevent memory exhaustion (OOM DoS), logged as an error, and fails over to `.bak`.
+- **Schema Version & Future-Version Handling:**
+  - The schema includes an integer `version` field (current: `1`).
+  - **Future Version Protection:** If `version > kCurrentSchemaVersion` (e.g. file generated by a future browser version), the service **must refuse destructive writes**. It enters a read-only / ephemeral memory mode to protect the user's future data file from being clobbered or downgraded.
+  - Backward compatibility: If `version < kCurrentSchemaVersion`, an in-memory migration function upgrades the data structures to the current schema.
 - **Threading Model & Off-UI-Thread I/O:**
   - In adherence to Chromium threading invariants, **all filesystem I/O on the UI thread is strictly forbidden** (`DCHECK_CURRENTLY_ON(BrowserThread::UI)`).
-  - Serialization from in-memory C++ structures into JSON strings occurs on the UI thread.
-  - File writing is dispatched to a background sequenced task runner created with:
+  - In-memory C++ state mutations and JSON string serialization occur on the UI thread.
+  - Disk operations (writing, renaming, `.bak` rotation) are dispatched to a background sequenced task runner created with:
     `base::ThreadPool::CreateSequencedTaskRunner({base::MayBlock(), base::TaskPriority::USER_VISIBLE, base::TaskShutdownBehavior::BLOCK_SHUTDOWN})`.
-  - `TaskShutdownBehavior::BLOCK_SHUTDOWN` ensures that any in-flight write task will complete before Chromium shuts down, preventing partial truncation upon normal exit.
-- **Debounce & Flush Rules:**
-  - A provisional debounce interval of `base::Milliseconds(500)` will be configured for non-critical tab focus and scroll events.
-  - Critical persistence events must bypass the timer and trigger immediate asynchronous dispatch to the background writer via `ImportantFileWriter::WriteNow()`:
-    1. Space creation
-    2. Space deletion
-    3. Space rename
-    4. Tab close
-    5. Window close
-    6. Browser shutdown sequence (`KeyedService::Shutdown()`)
+  - `TaskShutdownBehavior::BLOCK_SHUTDOWN` guarantees that in-flight write tasks finish before Chromium exits, preventing file truncation during standard browser shutdowns.
+- **Debounce & Immediate Flush Rules:**
+  - **Debounced Writes (Provisional 500ms):** Routine in-flight changes (tab focus, tab URL navigation, scroll position, title changes) reset a 500ms debounce timer to prevent disk thrashing.
+  - **Immediate Asynchronous Flush (`ImportantFileWriter::WriteNow()`):** Critical user or lifecycle boundaries bypass the debounce timer and flush immediately with `BLOCK_SHUTDOWN`:
+    1. Explicit space creation
+    2. Explicit space deletion
+    3. Explicit space rename
+    4. Window close
+    5. Browser shutdown (`KeyedService::Shutdown()`)
 - **Backup, Recovery & Crash Guarantees:**
-  - `ImportantFileWriter` protects against **application crashes** during file writes (by writing to a temporary file in the same directory and renaming atomically). It does **not** guarantee durability against sudden hardware power cuts or OS kernel crashes before filesystem buffers flush.
-  - An atomic backup file (`obscure_spaces.json.bak`) must be maintained.
-  - Rotation rule: The `.bak` file is replaced only **after** the replacement file has successfully written and validated on disk.
-  - On startup, if the primary JSON file is missing, empty, or fails schema validation, the service must automatically attempt restoration from `.bak`. If both are invalid, initialize with a clean default empty space and log a non-fatal error without crashing.
+  - `ImportantFileWriter` writes data to a temporary file in the same directory (`obscure_spaces.json.tmp`) and executes an atomic POSIX `rename()` / Windows `MoveFileEx()`.
+  - This protects against **application crashes** during writes. It does not claim durability against sudden hardware power cuts or OS kernel crashes before filesystem buffers flush.
+  - An atomic backup file (`obscure_spaces.json.bak`) is maintained.
+  - Rotation rule: The `.bak` file is updated only **after** the replacement file has successfully written and validated on disk.
+  - Startup recovery: If `obscure_spaces.json` is missing, empty, or fails schema validation, the service loads `obscure_spaces.json.bak`. If both are corrupted, it renames the corrupted file to `obscure_spaces.json.corrupt`, initializes a default empty workspace, and logs a non-fatal warning without crashing.
 - **Platform File Permissions:**
-  - On Linux/POSIX: Enforce `0600` (`base::FILE_PERMISSION_READ_BY_USER | base::FILE_PERMISSION_WRITE_BY_USER`) via `base::SetPosixFilePermissions`.
-  - On Windows: Files inherit ACLs from `%LOCALAPPDATA%`, restricting access to the user's security identifier (SID).
+  - **Linux/POSIX:** Permissions are explicitly set to `0600` (`base::FILE_PERMISSION_READ_BY_USER | base::FILE_PERMISSION_WRITE_BY_USER`) via `base::SetPosixFilePermissions`.
+  - **Windows:** Files rely on standard NTFS DACL inheritance from the user's profile directory (`%LOCALAPPDATA%`), which restricts access to the user's Windows Security Identifier (SID) and SYSTEM/Administrators. No non-portable Windows ACL drivers are required.
 
 ### 6. Security & Input Validation Invariants
-- **URL Scheme Whitelist:** On workspace restoration, URLs are strictly whitelisted to `http://`, `https://`, and `about:blank`.
-  - All other schemes (`javascript:`, `file:`, `chrome:`, `data:`, `blob:`) must be rejected and replaced with `about:blank`.
-- **Mojo IPC Validation:** Every IPC message from WebUI renderers must be explicitly validated in the C++ browser process before execution (validating Space IDs, URL syntax, and string lengths).
-- **DOM Injection Prevention:** WebUI frontend code must use `textContent` exclusively for user-controlled strings (tab titles, URLs, Space names). `innerHTML` is strictly forbidden.
-- **Sandbox Requirement:** All releases, packages, and tests must run with Chromium's native sandbox active. Launching or distributing with `--no-sandbox` is prohibited.
+- **URL Scheme Allowlist on Restore:**
+  - Restored tab URLs are strictly validated against an explicit allowlist: `http://`, `https://`, `about:blank`, and `chrome://newtab/`.
+  - All other schemes (`javascript:`, `file:`, `chrome:`, `chrome-extension:`, `data:`, `blob:`, `view-source:`) are rejected and replaced with `about:blank`.
+- **Mojo IPC Validation:**
+  - All renderer IPC messages are validated in C++ before execution (string length bounds <= 128 for space names, valid UTF-8, integer index bounds checking).
+  - Malformed messages trigger `mojo::ReportBadMessage()`.
+- **DOM Injection Prevention:**
+  - WebUI frontend code must use `textContent` exclusively for all user-controlled strings (tab titles, URLs, Space names). `innerHTML` is strictly forbidden.
+- **Sandbox Invariant:**
+  - All releases, packages, and tests must run with Chromium's native sandbox active. Launching or distributing with `--no-sandbox` is strictly prohibited.
 
 ---
 
 ## Consequences
 - Protects users by remaining on an actively maintained Stable branch with a guaranteed 14-day security rebase turnaround.
-- Guarantees predictable, fast iteration by leveraging WebUI and HTML/CSS/TS.
-- Protects user data from corruption during crashes via atomic writes, debounced commits, and `.bak` rotation without violating Chromium UI-thread invariants.
-- Prevents security regressions by enforcing Chromium's sandboxing, scheme whitelisting, and strict IPC validation.
-- Clear, honest communication with users regarding cookie sharing until v1.1.
+- Eliminates UI-thread I/O jank and prevents data corruption during crashes via atomic writes and `.bak` rotation.
+- Prevents memory exhaustion attacks via the 10 MB file cap.
+- Protects user data during version downgrades via non-destructive future-schema handling.
+- Ensures privacy in Incognito and Guest modes by eliminating disk writes.
+- Honest, accurate user communication regarding session sharing without speculative version promises.

@@ -1,76 +1,138 @@
 # Chromium Git Branch & Patch Export Workflow
-**Zorquelz Technologies | Developer Guide**
+**Zorquelz Technologies | Developer & QA Guide**
+**Target Baseline:** Chromium Stable `155.0.8059.39` (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`)
 
-> This document defines how development occurs inside the live Chromium checkout (`~/Obscure/chromium/src`) using a dedicated Git feature branch rather than raw file rsyncing.
-
----
-
-## 1. Why the Rsync / In-Place Workflow Was Rejected
-Rsyncing files into a detached HEAD inside `~/Obscure/chromium/src` creates severe operational risks:
-1. Running `gclient sync` or `git checkout .` silently blows away uncommitted custom files.
-2. Changes outside `//chrome/browser/obscure/` become mixed with dirty tree state.
-3. Upstream rebase conflicts cannot be resolved cleanly using standard Git three-way merges.
+> This document defines how development, testing, patch generation, and safe rollbacks are executed inside the live Chromium checkout (`~/Obscure/chromium/src`) using Git branches, per-commit patch series, safe bundle backups, and LF line ending normalization.
 
 ---
 
-## 2. The Chromium Git Branch Architecture
+## 1. Branch Architecture & Baseline Pinning
 
-All work inside the Chromium checkout is tracked on a dedicated Git branch:
+All Obscure engineering inside the ~80GB Chromium checkout is isolated on a dedicated Git branch rooted at the official Stable 155 release tag:
 
 ```text
-upstream/origin/main (Pinned: e3a47f1afe3c87307d7b98638a576a5993fb95d7)
+upstream/origin/main
          │
-         └── obscure-v1.0 (Our local Chromium work branch)
-                  ├── Commit: "feat(obscure): add obscure browser module"
-                  └── Commit: "feat(obscure): register WebUI configs and hooks"
+         ├── [Tag: 155.0.8059.39] (Commit: 3ff7ac5a9224be9156d7f8703a06e22890aafd34)
+         │         │
+         │         └── obscure-baseline-155.0.8059.39 (Local Immutable Baseline Tag)
+         │                   │
+         │                   └── obscure-stable-155 (Active Obscure Work Branch)
+         │                             ├── Commit 1: "feat(obscure): scaffold isolated module"
+         │                             └── Commit 2: "feat(obscure): register WebUI configs"
 ```
 
 ---
 
-## 3. Standard Operating Commands in WSL2
+## 2. Line Ending Normalization (`.gitattributes`)
 
-### Step A: Initialize the Work Branch (One-Time Setup)
+Because development spans the Windows 11 host (where the Obscure control repository resides) and the WSL2 Ubuntu environment (where Chromium is built), CRLF line endings can corrupt patch application (`git am`).
+
+The Obscure control repository enforces strict Unix line feeds (LF) via `.gitattributes`:
+```gitattributes
+* text=auto eol=lf
+*.patch text eol=lf
+*.cc text eol=lf
+*.h text eol=lf
+*.gn text eol=lf
+*.gni text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+```
+
+---
+
+## 3. Standard Operating Procedures in WSL2
+
+### Step A: Verify Pinned Baseline & Establish Baseline Tag
 ```bash
 cd ~/Obscure/chromium/src
 
-# Ensure on pinned commit
-git checkout e3a47f1afe3c87307d7b98638a576a5993fb95d7
+# 1. Ensure on pinned commit
+git checkout 3ff7ac5a9224be9156d7f8703a06e22890aafd34
 
-# Create dedicated Obscure development branch
-git checkout -b obscure-v1.0
+# 2. Establish local immutable baseline tag if not present
+git tag -a obscure-baseline-155.0.8059.39 3ff7ac5a9224be9156d7f8703a06e22890aafd34 -m "Obscure Stable 155 Immutable Baseline"
+
+# 3. Create or checkout dedicated development branch
+git checkout -B obscure-stable-155 obscure-baseline-155.0.8059.39
 ```
 
-### Step B: Developing Custom Code
-1. Place new files directly in `chrome/browser/obscure/`.
-2. Apply external hooks (as cataloged in `HOOKS.md`).
-3. Compile and verify locally:
+### Step B: Developing & Committing Custom Code
+1. Place custom files strictly in `chrome/browser/obscure/`.
+2. Apply minimal registration hooks as cataloged in `HOOKS.md`.
+3. Commit changes in small, logical, atomic Git commits:
    ```bash
-   autoninja -C out/Obscure chrome
+   git add chrome/browser/obscure/ chrome/browser/ui/webui/chrome_web_ui_configs.cc
+   git commit -m "feat(obscure): register ObscureNewTabPageUIConfig (HK-01)"
+   ```
+4. Verify compilation locally:
+   ```bash
+   ninja -C out/Stable155 chrome
    ```
 
-### Step C: Exporting Unified Patches to Obscure Control Repo
-When a milestone or tracer bullet is ready for Claude's review:
+### Step C: Exporting Per-Commit Patches via `git format-patch`
+When code is ready for Claude's independent review and CEO gate approval:
 ```bash
 cd ~/Obscure/chromium/src
 
-# Export clean patch series against pinned upstream baseline
-git diff e3a47f1afe3c87307d7b98638a576a5993fb95d7..obscure-v1.0 > /mnt/f/Zorquelz/Obscure/patches/0001-tracer-bullet-ntp.patch
+# Generate per-commit numbered patch series into Obscure repo patches/ directory
+git format-patch obscure-baseline-155.0.8059.39..obscure-stable-155 -o /mnt/f/Zorquelz/Obscure/patches/
 ```
+**Benefits over monolithic diffs:**
+- Retains commit author, timestamps, and commit log messages.
+- Produces atomic, individually reviewable patches (`0001-....patch`, `0002-....patch`).
+- Enables three-way patch merging and verification via `git am`.
 
-### Step D: Verifying Upstream Baseline Purity
-To verify that no unexpected files or modifications exist:
+### Step D: Applying Patches to a Fresh Checkout
+To reproduce or audit the build on a fresh, clean Chromium checkout:
 ```bash
 cd ~/Obscure/chromium/src
-git status
-git diff e3a47f1afe3c87307d7b98638a576a5993fb95d7 --stat
+
+# 1. Checkout baseline tag
+git checkout obscure-baseline-155.0.8059.39
+git checkout -b audit-verification-branch
+
+# 2. Test-apply patches without modifying tree (dry run)
+git apply --check /mnt/f/Zorquelz/Obscure/patches/*.patch
+
+# 3. Apply patch series preserving commit history
+git am --signoff /mnt/f/Zorquelz/Obscure/patches/*.patch
+
+# (If a conflict occurs, abort cleanly with: git am --abort)
 ```
 
-### Step E: Absolute Rollback / Reset
-If any experiment must be completely aborted to restore the pristine baseline:
+---
+
+## 4. Safe Rollback & Backup Procedures (No Destructive Cleanups)
+
+### Strict Operational Bans
+- **BANNED:** Never run `git clean -ffd` without backing up commits.
+- **BANNED:** Never run `gclient sync -D` without an explicit safety plan approved by the Chief Architect, as `-D` automatically deletes untracked submodules and custom directories.
+
+### Procedure 1: Creating a Safe Git Bundle Backup
+Before any rebase, reset, or major branch switch, create a self-contained Git bundle backup:
 ```bash
 cd ~/Obscure/chromium/src
-git checkout e3a47f1afe3c87307d7b98638a576a5993fb95d7
-git branch -D obscure-v1.0
-git clean -ffd
+mkdir -p /mnt/f/Zorquelz/Obscure/backups
+git bundle create /mnt/f/Zorquelz/Obscure/backups/obscure-backup-$(date +%Y%m%d_%H%M%S).bundle obscure-baseline-155.0.8059.39..obscure-stable-155
 ```
-**Guaranteed Result:** The Chromium source checkout returns 100% to the exact pristine baseline with zero untracked files.
+*Verification:* `git bundle verify /mnt/f/Zorquelz/Obscure/backups/obscure-backup-*.bundle`
+
+### Procedure 2: Safe Branch Rollback
+If an experimental change must be aborted or rewound to the pristine baseline:
+```bash
+cd ~/Obscure/chromium/src
+
+# 1. Preserve current work on a dated emergency recovery branch
+git branch emergency-backup-$(date +%Y%m%d_%H%M%S)
+
+# 2. Safely rewind development branch to the baseline tag
+git checkout obscure-stable-155
+git reset --hard obscure-baseline-155.0.8059.39
+
+# 3. Verify clean state against baseline
+git status --short
+git diff obscure-baseline-155.0.8059.39 --stat
+```
+**Guaranteed Result:** Zero code is lost (preserved in bundle and backup branch), while `obscure-stable-155` returns 100% to the verified Stable 155 baseline.
