@@ -1,0 +1,13 @@
+Timestamp (UTC): Mon Oct 12 12:36:06 UTC 2026
+Environment: WSL2 Ubuntu 24.04 (WSLg DISPLAY=:0 WAYLAND_DISPLAY=wayland-0)
+=== COMMAND: ./out/Stable155/chrome --headless=new --screenshot=/mnt/f/Zorquelz/Obscure/docs/evidence/screenshots/tp06_gui_launch.png --window-size=1280,800 https://zorquelz.com ===
+[365:365:1012/123606.419784:ERROR:ui/base/cursor/cursor_factory.cc:98] Not implemented reached in virtual void ui::CursorFactory::ObserveThemeChanges(). 
+[365:365:1012/123606.767421:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[365:365:1012/123606.820071:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.NetworkManager.GetDevices: object_path= /org/freedesktop/NetworkManager: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.NetworkManager was not provided by any .service files
+[365:365:1012/123607.817416:ERROR:ui/ozone/public/platform_screen.cc:40] Not implemented reached in virtual std::unique_ptr<PlatformScreen::PlatformScreenSaverSuspender> ui::PlatformScreen::SuspendScreenSaver(). 
+277636 bytes written to file /mnt/f/Zorquelz/Obscure/docs/evidence/screenshots/tp06_gui_launch.png
+[365:365:1012/123608.154173:ERROR:base/process/kill_posix.cc:33] waitpid(400): No child processes (10)
+EXIT_CODE: 0
+
+=== SCREENSHOT FILE ARTIFACT ===
+-rwxrwxrwx 1 lucifer-1403 lucifer-1403 272K Oct 12 12:36 /mnt/f/Zorquelz/Obscure/docs/evidence/screenshots/tp06_gui_launch.png
