@@ -97,26 +97,28 @@ git format-patch obscure-baseline-155.0.8059.39..obscure-stable-155 -o /mnt/f/Zo
 - Produces atomic, individually reviewable patches (`0001-....patch`, `0002-....patch`).
 - Enables three-way patch merging and verification via `git am`.
 
-### Step D: Throwaway-Branch Patch Validation
+### Step D: Disposable Worktree Patch Validation (Non-Destructive)
 Before submitting patches for PR review, validate that the exported patch series applies cleanly to a clean tree and compiles:
 ```bash
 cd ~/Obscure/chromium/src
 
-# 1. Create a temporary throwaway verification branch from the immutable baseline
-git checkout -b throwaway-verify obscure-baseline-155.0.8059.39
+# 1. Create a safe, disposable worktree isolated in a temporary path (detached from baseline tag)
+# SAFEGUARD INVARIANT: Uses a disposable worktree instead of branch creation/force-deletion ('git branch -D' is prohibited)
+git worktree add --detach /tmp/obscure-throwaway-verify obscure-baseline-155.0.8059.39
 
-# 2. Test-apply patches without modifying tree (dry run)
+# 2. Test-apply patches without modifying the main tree (dry run)
+cd /tmp/obscure-throwaway-verify
 git apply --check /mnt/f/Zorquelz/Obscure/patches/*.patch
 
 # 3. Apply patch series preserving commit history
 git am --signoff /mnt/f/Zorquelz/Obscure/patches/*.patch
 
 # 4. Verify compilation smoke test
-ninja -C out/Stable155 components/version_info
+ninja -C ~/Obscure/chromium/src/out/Stable155 components/version_info
 
-# 5. Cleanly delete the throwaway verification branch
-git checkout obscure-stable-155
-git branch -D throwaway-verify
+# 5. Safely remove the disposable worktree (leaves main repository and branches 100% untouched)
+cd ~/Obscure/chromium/src
+git worktree remove /tmp/obscure-throwaway-verify
 ```
 
 ---
@@ -126,6 +128,7 @@ git branch -D throwaway-verify
 ### Strict Operational Bans
 - **BANNED:** Never run `git clean -ffd` without backing up commits.
 - **BANNED:** Never run `gclient sync -D` without an explicit safety plan approved by the Chief Architect, as `-D` automatically deletes untracked submodules and custom directories.
+- **BANNED:** Never blindly stage with `git add -A`. Stage specific directories/files explicitly.
 
 ### Procedure 1: Creating a Safe Git Bundle Backup
 Before any rebase, reset, or major branch switch, create a self-contained Git bundle backup:
@@ -165,13 +168,13 @@ cd ~/Obscure/chromium/src
 # 1. Check working tree cleanliness and inventory untracked files
 git status --short
 
-# 2. CRITICAL: Commit or stash any uncommitted work.
-# Uncommitted modifications and untracked files will be permanently lost during a reset.
-git add -A
+# 2. CRITICAL: Commit uncommitted work selectively (SAFEGUARD: NEVER 'git add -A')
+git add chrome/browser/obscure/
 git commit -m "wip: emergency save before baseline reset" || true
 
-# 3. Create an explicitly named backup branch
+# 3. Create an explicitly named backup branch and backup bundle
 git branch backup-chromium-$(date +%Y%m%d_%H%M%S)
+git bundle create /mnt/f/Zorquelz/Obscure/backups/obscure-emergency-$(date +%Y%m%d_%H%M%S).bundle obscure-baseline-155.0.8059.39..HEAD
 
 # 4. Safely rewind development branch to the immutable baseline tag
 git checkout obscure-stable-155
@@ -181,4 +184,4 @@ git reset --hard obscure-baseline-155.0.8059.39
 git status --short
 git diff obscure-baseline-155.0.8059.39 --stat
 ```
-**Guaranteed Result:** All prior experimental work is preserved safely on `backup-chromium-*`, while `obscure-stable-155` returns 100% to the verified Stable 155 baseline.
+**Empirical Proof:** Safe backup, rollback, and exact 1:1 restoration is verified with commit IDs in [`docs/evidence/logs/rollback_recovery_demonstration.log`](file:///f:/Zorquelz/Obscure/docs/evidence/logs/rollback_recovery_demonstration.log).

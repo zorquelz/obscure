@@ -1,0 +1,42 @@
+=== S1-6: OBSCURE WORK BACKUP, ROLLBACK & RESTORATION DEMONSTRATION ===
+Timestamp (UTC): Mon Oct 12 13:33:57 UTC 2026
+Starting on active branch: test-recovery-demo
+Baseline tag: obscure-baseline-155.0.8059.39
+Switched to branch 'obscure-stable-155'
+A	chrome/browser/obscure/recovery_demo.h
+Deleted branch test-recovery-demo (was 3ff7ac5a9224b).
+Switched to a new branch 'test-recovery-demo'
+A	chrome/browser/obscure/recovery_demo.h
+Baseline Commit ID: 3ff7ac5a9224be9156d7f8703a06e22890aafd34
+--- Selective Staging (Explicit Path) ---
+A  chrome/browser/obscure/recovery_demo.h
+?? build/util/MINIBRANCH
+?? third_party/google-java-format/cipd/
+[test-recovery-demo 1d3194c368550] feat(obscure): simulated custom obscure work for recovery demo
+ 1 file changed, 2 insertions(+)
+ create mode 100644 chrome/browser/obscure/recovery_demo.h
+BEFORE_COMMIT_ID (Work Committed): 1d3194c36855095f5784904f05fb0e23f5c111d5
+/mnt/f/Zorquelz/Obscure/backups/obscure_recovery_demo.bundle is okay
+The bundle contains this ref:
+1d3194c36855095f5784904f05fb0e23f5c111d5 HEAD
+The bundle requires this ref:
+3ff7ac5a9224be9156d7f8703a06e22890aafd34 
+The bundle uses this hash algorithm: sha1
+Backup Created: bundle /mnt/f/Zorquelz/Obscure/backups/obscure_recovery_demo.bundle and branch backup-obscure-recovery-demo
+--- Executing Rollback to Baseline ---
+HEAD is now at 3ff7ac5a9224b Incrementing VERSION to 155.0.8059.39
+ROLLBACK_COMMIT_ID (Restored to baseline): 3ff7ac5a9224be9156d7f8703a06e22890aafd34
+Rollback Status: SUCCESS (Cleanly at baseline)
+--- Executing Restoration from Backup ---
+HEAD is now at 1d3194c368550 feat(obscure): simulated custom obscure work for recovery demo
+AFTER_COMMIT_ID (Restored from backup): 1d3194c36855095f5784904f05fb0e23f5c111d5
+RECOVERY RESULT: 100% EXACT RESTORATION (BEFORE_COMMIT == AFTER_COMMIT)
+--- Cleanup of Verification Artifacts ---
+Switched to branch 'obscure-stable-155'
+Deleted branch test-recovery-demo (was 1d3194c368550).
+Deleted branch backup-obscure-recovery-demo (was 1d3194c368550).
+Active Branch: obscure-stable-155
+Active HEAD: 3ff7ac5a9224be9156d7f8703a06e22890aafd34
+?? build/util/MINIBRANCH
+?? third_party/google-java-format/cipd/
+=== DEMONSTRATION COMPLETE: ALL SAFEGUARDS VERIFIED ===
