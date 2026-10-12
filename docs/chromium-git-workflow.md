@@ -71,12 +71,15 @@ git checkout -B obscure-stable-155 obscure-baseline-155.0.8059.39
    ninja -C out/Stable155 chrome
    ```
 
-### Step C: Exporting Per-Commit Patches via `git format-patch`
+### Step C: Stale-Patch Purge & Exporting Per-Commit Patches
 When code is ready for Claude's independent review and CEO gate approval:
 ```bash
 cd ~/Obscure/chromium/src
 
-# Generate per-commit numbered patch series into Obscure repo patches/ directory
+# 1. Purge stale patches to ensure obsolete commits do not linger
+rm -f /mnt/f/Zorquelz/Obscure/patches/*.patch
+
+# 2. Generate clean per-commit numbered patch series into patches/ directory
 git format-patch obscure-baseline-155.0.8059.39..obscure-stable-155 -o /mnt/f/Zorquelz/Obscure/patches/
 ```
 **Benefits over monolithic diffs:**
@@ -84,14 +87,13 @@ git format-patch obscure-baseline-155.0.8059.39..obscure-stable-155 -o /mnt/f/Zo
 - Produces atomic, individually reviewable patches (`0001-....patch`, `0002-....patch`).
 - Enables three-way patch merging and verification via `git am`.
 
-### Step D: Applying Patches to a Fresh Checkout
-To reproduce or audit the build on a fresh, clean Chromium checkout:
+### Step D: Throwaway-Branch Patch Validation
+Before submitting patches for PR review, validate that the exported patch series applies cleanly to a clean tree and compiles:
 ```bash
 cd ~/Obscure/chromium/src
 
-# 1. Checkout baseline tag
-git checkout obscure-baseline-155.0.8059.39
-git checkout -b audit-verification-branch
+# 1. Create a temporary throwaway verification branch from the immutable baseline
+git checkout -b throwaway-verify obscure-baseline-155.0.8059.39
 
 # 2. Test-apply patches without modifying tree (dry run)
 git apply --check /mnt/f/Zorquelz/Obscure/patches/*.patch
@@ -99,7 +101,12 @@ git apply --check /mnt/f/Zorquelz/Obscure/patches/*.patch
 # 3. Apply patch series preserving commit history
 git am --signoff /mnt/f/Zorquelz/Obscure/patches/*.patch
 
-# (If a conflict occurs, abort cleanly with: git am --abort)
+# 4. Verify compilation smoke test
+ninja -C out/Stable155 components/version_info
+
+# 5. Cleanly delete the throwaway verification branch
+git checkout obscure-stable-155
+git branch -D throwaway-verify
 ```
 
 ---
@@ -115,9 +122,9 @@ Before any rebase, reset, or major branch switch, create a self-contained Git bu
 ```bash
 cd ~/Obscure/chromium/src
 mkdir -p /mnt/f/Zorquelz/Obscure/backups
-git bundle create /mnt/f/Zorquelz/Obscure/backups/obscure-backup-$(date +%Y%m%d_%H%M%S).bundle obscure-baseline-155.0.8059.39..obscure-stable-155
+git bundle create /mnt/f/Zorquelz/Obscure/backups/obscure-backup-$(date +%Y%m%d_%H%M%S).bundle -50 HEAD
+git bundle verify /mnt/f/Zorquelz/Obscure/backups/obscure-backup-*.bundle
 ```
-*Verification:* `git bundle verify /mnt/f/Zorquelz/Obscure/backups/obscure-backup-*.bundle`
 
 ### Procedure 2: Safe Branch Rollback
 If an experimental change must be aborted or rewound to the pristine baseline:

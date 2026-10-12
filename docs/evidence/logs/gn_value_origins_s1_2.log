@@ -1,0 +1,34 @@
+Timestamp (UTC): Mon Oct 12 12:21:00 UTC 2026
+=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list=is_component_build ===
+is_component_build
+    Current value (from the default) = false
+      From //build/config/BUILDCONFIG.gn:171
+
+    Component build. Setting to true compiles targets declared as "components"
+    as shared libraries loaded dynamically. This can sometimes speed up
+    development time by having smaller link steps. When false, components will
+    be linked statically.
+   
+    For more information see
+    https://chromium.googlesource.com/chromium/src/+/main/docs/component_build.md
+
+
+=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list=dcheck_always_on ===
+dcheck_always_on
+    Current value (from the default) = true
+      From //build/config/dcheck_always_on.gni:26
+
+
+=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list=symbol_level ===
+symbol_level
+    Current value (from the default) = 0
+      From //build/config/compiler/compiler.gni:161
+
+    How many symbols to include in the build. This affects the performance of
+    the build since the symbols are large and dealing with them is slow.
+      2 means regular build with symbols.
+      1 means minimal symbols, usually enough for backtraces only. Symbols with
+    internal linkage (static functions or those in anonymous namespaces) may not
+    appear when using this level.
+      0 means no symbols.
+

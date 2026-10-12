@@ -1,66 +1,66 @@
-Timestamp (UTC): Mon Oct 12 11:55:45 UTC 2026
+Timestamp (UTC): Mon Oct 12 12:20:57 UTC 2026
 === COMMAND: python3 /mnt/f/Zorquelz/Obscure/scripts/check_sandbox.py ===
-[809:809:1012/115545.362519:ERROR:ui/base/cursor/cursor_factory.cc:98] Not implemented reached in virtual void ui::CursorFactory::ObserveThemeChanges(). 
+[797:797:1012/122057.371611:ERROR:ui/base/cursor/cursor_factory.cc:98] Not implemented reached in virtual void ui::CursorFactory::ObserveThemeChanges(). 
 
-DevTools listening on ws://127.0.0.1:9222/devtools/browser/8af41262-b6ac-4890-8615-6b609e616c6a
-[809:809:1012/115545.637162:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
-[809:809:1012/115545.670655:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.NetworkManager.GetDevices: object_path= /org/freedesktop/NetworkManager: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.NetworkManager was not provided by any .service files
+DevTools listening on ws://127.0.0.1:9222/devtools/browser/0dc356c1-9f1b-4f7f-aa99-3512bc7d78b8
+[797:797:1012/122057.628959:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[797:797:1012/122057.661396:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.NetworkManager.GetDevices: object_path= /org/freedesktop/NetworkManager: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.NetworkManager was not provided by any .service files
 Name:	chrome
-Pid:	909
-PPid:	820
+Pid:	898
+PPid:	808
 NoNewPrivs:	1
 Seccomp:	2
 Seccomp_filters:	1
 Browser  user ns: user:[4026531837]
-Renderer user ns: user:[4026532319]
-Browser  pid  ns: pid:[4026532220]
+Renderer user ns: user:[4026532232]
+Browser  pid  ns: pid:[4026532221]
 Renderer pid  ns: pid:[4026532225]
 Name:	chrome
-Pid:	924
-PPid:	820
+Pid:	912
+PPid:	808
 NoNewPrivs:	1
 Seccomp:	2
 Seccomp_filters:	1
 Browser  user ns: user:[4026531837]
-Renderer user ns: user:[4026532319]
-Browser  pid  ns: pid:[4026532220]
+Renderer user ns: user:[4026532232]
+Browser  pid  ns: pid:[4026532221]
 Renderer pid  ns: pid:[4026532228]
 Name:	chrome
-Pid:	925
-PPid:	820
+Pid:	913
+PPid:	808
 NoNewPrivs:	1
 Seccomp:	2
 Seccomp_filters:	1
 Browser  user ns: user:[4026531837]
-Renderer user ns: user:[4026532319]
-Browser  pid  ns: pid:[4026532220]
+Renderer user ns: user:[4026532232]
+Browser  pid  ns: pid:[4026532221]
 Renderer pid  ns: pid:[4026532229]
 Name:	chrome
-Pid:	950
-PPid:	820
+Pid:	938
+PPid:	808
 NoNewPrivs:	1
 Seccomp:	2
 Seccomp_filters:	1
 Browser  user ns: user:[4026531837]
-Renderer user ns: user:[4026532319]
-Browser  pid  ns: pid:[4026532220]
-Renderer pid  ns: pid:[4026532232]
+Renderer user ns: user:[4026532232]
+Browser  pid  ns: pid:[4026532221]
+Renderer pid  ns: pid:[4026532233]
 Launching Chromium Stable 155 with sandbox enabled...
-Browser PID: 809
-Renderer PIDs found: ['909', '924', '925', '950']
+Browser PID: 797
+Renderer PIDs found: ['898', '912', '913', '938']
 
-=== RENDERER PID 909 STATUS ===
-
-=== USER & PID NAMESPACES ===
-
-=== RENDERER PID 924 STATUS ===
+=== RENDERER PID 898 STATUS ===
 
 === USER & PID NAMESPACES ===
 
-=== RENDERER PID 925 STATUS ===
+=== RENDERER PID 912 STATUS ===
 
 === USER & PID NAMESPACES ===
 
-=== RENDERER PID 950 STATUS ===
+=== RENDERER PID 913 STATUS ===
+
+=== USER & PID NAMESPACES ===
+
+=== RENDERER PID 938 STATUS ===
 
 === USER & PID NAMESPACES ===

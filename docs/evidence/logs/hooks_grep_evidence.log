@@ -1,0 +1,39 @@
+Timestamp (UTC): Mon Oct 12 12:21:03 UTC 2026
+=== HK-01 GREP: chrome/browser/ui/webui/chrome_web_ui_configs.cc ===
+330-  map.AddWebUIConfig(std::make_unique<WebRtcLogsUIConfig>());
+331-  map.AddWebUIConfig(std::make_unique<RegionalCapabilitiesInternalsUIConfig>());
+332-#if BUILDFLAG(ENABLE_WEBUI_NTP)
+333:  map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());
+334-#endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
+335-
+336-#if BUILDFLAG(ENABLE_WEBUI_CERTIFICATE_VIEWER)
+
+=== HK-02 GREP: chrome/browser/BUILD.gn ===
+1076-    "//chrome/browser/ui/webui/actor_internals",
+1077-    "//chrome/browser/ui/webui/bluetooth_internals",
+1078-    "//chrome/browser/ui/webui/bluetooth_internals:mojo_bindings",
+1079-    "//chrome/browser/ui/webui/chrome_urls",
+1080:    "//chrome/browser/ui/webui/connectors_internals",
+1081-    "//chrome/browser/ui/webui/content_settings",
+1082-    "//chrome/browser/ui/webui/context_hub",
+1083-    "//chrome/browser/ui/webui/data_sharing_internals",
+1084-    "//chrome/browser/ui/webui/engagement",
+
+=== HK-03 GREP (Signature & Registration): chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc ===
+1600-  WebApkInstallServiceFactory::GetInstance();
+1601-#endif
+1602-
+1603-  WebDataServiceFactory::GetInstance();
+1604:  webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
+1605-}
+1606-
+1607-void ChromeBrowserMainExtraPartsProfiles::PreProfileInit() {
+1608-  EnsureBrowserContextKeyedServiceFactoriesBuilt();
+
+=== HK-04 HEADER GREP: content/public/browser/web_ui_data_source.h ===
+63:  virtual void AddString(std::string_view name, std::u16string_view value) = 0;
+66:  virtual void AddString(std::string_view name, std::string_view value) = 0;
+97:  virtual void AddResourcePath(std::string_view path, int resource_id) = 0;
+101:  virtual void AddResourcePaths(
+105:  virtual void SetDefaultResource(int resource_id) = 0;
+147:  virtual void OverrideContentSecurityPolicy(

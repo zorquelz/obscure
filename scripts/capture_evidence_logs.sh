@@ -138,4 +138,54 @@ echo "Saved headless_dom_dump.log"
 } > "$LOG_DIR/sandbox_proc_status.log" 2>&1
 echo "Saved sandbox_proc_status.log"
 
+# 9. gn_value_origins_s1_2.log
+{
+  echo "Timestamp (UTC): $(date -u)"
+  echo "=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list=is_component_build ==="
+  ./buildtools/linux64/gn args out/Stable155 --list=is_component_build
+  echo ""
+  echo "=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list=dcheck_always_on ==="
+  ./buildtools/linux64/gn args out/Stable155 --list=dcheck_always_on
+  echo ""
+  echo "=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list=symbol_level ==="
+  ./buildtools/linux64/gn args out/Stable155 --list=symbol_level
+} > "$LOG_DIR/gn_value_origins_s1_2.log" 2>&1
+echo "Saved gn_value_origins_s1_2.log"
+
+# 10. submodule_revisions_s1_1.log
+{
+  echo "Timestamp (UTC): $(date -u)"
+  python3 /mnt/f/Zorquelz/Obscure/scripts/audit_submodules.py
+} > "$LOG_DIR/submodule_revisions_s1_1.log" 2>&1
+echo "Saved submodule_revisions_s1_1.log"
+
+# 11. chromium_reflog_and_stash.log
+{
+  echo "Timestamp (UTC): $(date -u)"
+  echo "=== COMMAND: git reflog -n 40 ==="
+  git reflog -n 40
+  echo ""
+  echo "=== COMMAND: git stash list ==="
+  git stash list
+} > "$LOG_DIR/chromium_reflog_and_stash.log" 2>&1
+echo "Saved chromium_reflog_and_stash.log"
+
+# 12. hooks_grep_evidence.log
+{
+  echo "Timestamp (UTC): $(date -u)"
+  echo "=== HK-01 GREP: chrome/browser/ui/webui/chrome_web_ui_configs.cc ==="
+  grep -n -C 3 'NewTabPageUIConfig' chrome/browser/ui/webui/chrome_web_ui_configs.cc
+  echo ""
+  echo "=== HK-02 GREP: chrome/browser/BUILD.gn ==="
+  grep -n -C 4 'connectors_internals' chrome/browser/BUILD.gn
+  echo ""
+  echo "=== HK-03 GREP (Signature & Registration): chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc ==="
+  grep -n -C 3 'void ChromeBrowserMainExtraPartsProfiles::EnsureBrowserContextKeyedServiceFactoriesBuilt()' chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc || true
+  grep -n -C 4 'webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance()' chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc
+  echo ""
+  echo "=== HK-04 HEADER GREP: content/public/browser/web_ui_data_source.h ==="
+  grep -n -E '(SetDefaultResource|AddResourcePath|OverrideContentSecurityPolicy|AddString)' content/public/browser/web_ui_data_source.h
+} > "$LOG_DIR/hooks_grep_evidence.log" 2>&1
+echo "Saved hooks_grep_evidence.log"
+
 echo "ALL_LOGS_CAPTURED_SUCCESSFULLY"
