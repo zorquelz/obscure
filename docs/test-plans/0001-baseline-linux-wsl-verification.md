@@ -1,50 +1,116 @@
 # Test Plan 0001: Baseline Linux/WSL2 Build & Launch Verification
 **Zorquelz Technologies | QA & Testing Specification**
 
-## Status
-Verified on WSL2 Ubuntu 24.04 (`2026-10-11`)
+## Status & Tracking
+- **Document Version:** 2.0 (Updated to Stable Baseline)
+- **Status:** **VERIFIED (Pass)** on WSL2 Ubuntu 24.04 (`2026-10-12`)
+- **Review & QA Lead:** Claude
+- **Engineering Lead:** Antigravity (Implementation)
+- **Two-Stage Gate:** Pre-Stage 1 Verification Baseline
 
-## Target Environment
-- Host: Windows 11 (AMD Ryzen 9 9900X, 32GB RAM)
-- Subsystem: Ubuntu 24.04 LTS (WSL2 `Obscure-Ubuntu`)
-- Source Path: `~/Obscure/chromium/src`
-- Output Directory: `out/Obscure`
-- Commit Hash: `e3a47f1afe3c87307d7b98638a576a5993fb95d7`
+## Pinned Baseline Environment
+- **Host System:** Windows 11 Pro (AMD Ryzen 9 9900X 12-Core, 32GB RAM)
+- **Subsystem:** Ubuntu 24.04 LTS (WSL2 instance `Obscure-Ubuntu`, Kernel 5.15.x / 6.x)
+- **Chromium Tree:** `~/Obscure/chromium/src`
+- **Pinned Upstream Tag:** `155.0.8059.39` (Official Desktop Stable Channel, Oct 6, 2026)
+- **Pinned Commit Hash:** `3ff7ac5a9224be9156d7f8703a06e22890aafd34`
+- **Active Build Output Directory:** `out/Stable155` (`is_debug=false`, monolithic non-component)
+- **Release Config Output Directory:** `out/Release155` (`is_debug=false`, `is_component_build=false`, `symbol_level=0`)
+- **Preserved Rollback Artifact:** `out/Obscure` (Chromium 157.0.8083.0, preserved intact from 2026-10-10)
 
 ---
 
 ## Verification Results Matrix
 
-| Step | Test Description | Target Command | Actual Result | Status |
-|---|---|---|---|---|
-| **TP-01** | Git Status Cleanliness | `git status -s` | `0` untracked, `0` modified | **PASS (Verified)** |
-| **TP-02** | Chromium Version Identification | `cat chrome/VERSION` | `157.0.8083.0` | **PASS (Verified)** |
-| **TP-03** | GN Build Args Check | `cat out/Obscure/args.gn` | `is_debug=false`, `is_component_build=true`, `symbol_level=0` | **PASS (Verified)** |
-| **TP-04** | Sandbox Execution (Headless) | `./out/Obscure/chrome --headless=new --dump-dom https://example.com` | Exited 0; full DOM dumped; seccomp/namespace sandbox active | **PASS (Verified)** |
-| **TP-05** | Interactive GUI Launch (WSLg) | `./out/Obscure/chrome https://zorquelz.com` | Window rendered zorquelz.com via Wayland display | **PASS (Verified 2026-10-10)** |
-| **TP-06** | Full Non-Component Release Build | `is_component_build=false` | Not yet compiled (deferred to packaging milestone) | **NOT YET TESTED** |
-| **TP-07** | Windows Native Host Compilation | MSVC toolchain on Windows 11 | Not yet executed | **NOT YET TESTED** |
-| **TP-08** | Upstream Rebase Rehearsal | Rebase onto updated release tag | Scheduled before November 14, 2026 | **PENDING** |
+| Step ID | Test Description | Target Command / Method | Expected Result | Actual Result | Verification Status | Date Verified |
+|---|---|---|---|---|---|---|
+| **TP-01** | Git Status & Tag Cleanliness | `git status --short --branch`<br>`git describe --tags --exact-match HEAD` | Clean working tree; exact tag match `155.0.8059.39` | Branch `obscure-stable-155`; 0 untracked, 0 modified; exact tag `155.0.8059.39` | **PASS (Verified)** | 2026-10-12 |
+| **TP-02** | Version File Identification | `cat chrome/VERSION` | Major 155, Minor 0, Build 8059, Patch 39 | `MAJOR=155 MINOR=0 BUILD=8059 PATCH=39` | **PASS (Verified)** | 2026-10-12 |
+| **TP-03** | GN Build Args Check | `cat out/Stable155/args.gn`<br>`gn args out/Stable155 --list --short` | `is_debug=false`, resolves `is_component_build=false` | Monolithic non-component build verified; `is_component_build=false`, `symbol_level=0` | **PASS (Verified)** | 2026-10-12 |
+| **TP-04** | Sandboxed Headless DOM Dump | `./out/Stable155/chrome --headless=new --dump-dom https://example.com` | Exited 0; full DOM dumped; sandbox active without `--no-sandbox` | Exit code 0; dumped `<title>Example Domain</title>`; executed with active sandbox | **PASS (Verified)** | 2026-10-12 |
+| **TP-05** | Live Kernel Sandbox Inspection | `python3 scripts/check_sandbox.py` (inspecting `/proc/<renderer-pid>/status` & ns) | `NoNewPrivs=1`, `Seccomp=2`, isolated User/PID namespaces | Renderer PID 501: `NoNewPrivs: 1`, `Seccomp: 2`, isolated User/PID namespaces verified | **PASS (Verified)** | 2026-10-12 |
+| **TP-06** | Interactive GUI Launch (WSLg) | `./out/Stable155/chrome https://zorquelz.com` | Wayland/X11 GUI window renders smoothly | Window rendered via WSLg display server; GPU/software rasterization functional | **PASS (Verified)** | 2026-10-12 |
+| **TP-07** | Non-Component Config & Smoke Build | `./buildtools/linux64/gn gen out/Release155`<br>`ninja -C out/Release155 components/version_info` | 35k targets generated; clean static archive compile | 35,979 targets generated in 3,382ms; 2,823 steps compiled to `libversion_info.a`; exit 0 | **PASS (Verified)** | 2026-10-12 |
+| **TP-08** | Windows Native Host Compilation | MSVC toolchain directly on Windows 11 | Out of scope for WSL2 Linux baseline | Not yet executed (Deferred to Windows packaging milestone) | **NOT YET TESTED (Host unverified)** | — |
+| **TP-09** | Upstream Rebase Rehearsal | Rebase onto next Stable point release | Scheduled within 14-day SLA of upstream release | Monitored; tag 155.0.8059.39 remains active GA Stable | **SCHEDULED** | Due Oct 20, 2026 |
 
 ---
 
-## Detailed Command Logs (Evidence)
+## Detailed Command Logs & Verifiable Evidence
 
-### TP-04: Sandboxed Headless DOM Dump Verification
+### 1. TP-01: Git Baseline Verification
 ```bash
 $ cd ~/Obscure/chromium/src
-$ ./out/Obscure/chrome --headless=new --dump-dom https://example.com
-<!DOCTYPE html>
-<html lang="en">
+$ git status --short --branch
+## obscure-stable-155
+$ git rev-parse HEAD
+3ff7ac5a9224be9156d7f8703a06e22890aafd34
+$ git describe --tags --exact-match HEAD
+155.0.8059.39
+```
+
+### 2. TP-04: Headless Execution with Active Sandbox
+```bash
+$ cd ~/Obscure/chromium/src
+$ ./out/Stable155/chrome --headless=new --dump-dom https://example.com
+<!doctype html>
+<html>
 <head>
     <title>Example Domain</title>
 ...
 </html>
+$ echo $?
+0
 ```
-*Note on Sandbox Status:* The test ran **without** `--no-sandbox`. Chromium's Linux sandbox (User Namespaces + BPF seccomp) operated successfully inside WSL2 on Ubuntu 24.04.
+*Note:* No sandbox disabling flags (`--no-sandbox`, `--disable-seccomp-filter-sandbox`, etc.) were used.
+
+### 3. TP-05: Live Kernel Sandbox Proof (`/proc` and Namespaces)
+Inspection of the live renderer process launched during `./out/Stable155/chrome`:
+
+```text
+Browser PID: 394
+Renderer PIDs found: ['501', '512', '513', '551']
+
+=== RENDERER PID 501 STATUS (/proc/501/status) ===
+Name:               chrome
+Pid:                501
+PPid:               405
+NoNewPrivs:         1
+Seccomp:            2
+Seccomp_filters:    1
+
+=== USER & PID NAMESPACES (/proc/<pid>/ns/) ===
+Browser  user ns: user:[4026531837]
+Renderer user ns: user:[4026532295]   <-- Isolated unprivileged user namespace (Layer 1)
+Browser  pid  ns: pid:[4026532219]
+Renderer pid  ns: pid:[4026532228]   <-- Isolated PID namespace
+```
+
+**Security Primitives Established:**
+1. **`NoNewPrivs: 1`**: Prevents child processes from gaining elevated privileges via setuid/setgid binaries.
+2. **`Seccomp: 2` (BPF filter)**: Syscall filtering strictly intercepts all unauthorized kernel syscalls.
+3. **User Namespace Isolation**: The renderer is constrained within an unprivileged sandbox UID mapping.
+4. **PID Namespace Isolation**: The renderer cannot see, signal, or communicate with browser or system processes via PID.
+
+### 4. TP-07: Non-Component Build Evidence (`out/Release155`)
+```bash
+$ cat out/Release155/args.gn
+is_debug = false
+is_component_build = false
+symbol_level = 0
+
+$ ./buildtools/linux64/gn gen out/Release155
+Done. Made 35979 targets from 5065 files in 3382ms
+
+$ ninja -C out/Release155 components/version_info
+[2823/2823] AR obj/components/version_info/libversion_info.a
+$ echo $?
+0
+```
 
 ---
 
-## Rules for Future Executions
-1. No developer or automated script may invoke tests with `--no-sandbox` unless diagnosing low-level kernel namespaces.
-2. Production packages and release candidate artifacts must never bundle or rely on sandbox-bypass flags.
+## Operating Invariants & Testing Rules
+1. **Zero Sandbox Weakening:** Under no circumstances may `--no-sandbox` be passed in automated test suites, CI scripts, or standard developer verification runs.
+2. **Environment Separation:** All compilation and execution testing occurs strictly inside the WSL2 `Obscure-Ubuntu` instance. The Windows host system files and registry remain untouched.
+3. **Rollback Baseline Integrity:** The preserved Chromium 157 directory (`out/Obscure`) must remain untouched as a comparative baseline.
