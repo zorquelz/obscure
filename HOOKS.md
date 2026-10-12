@@ -86,11 +86,21 @@
 
 ---
 
-### HK-04: WebUI Resource Packaging
+### HK-04: WebUI Resource Packaging, API Invariants & CSP Policy
 - **Packaging Architecture & Zero-Touchpoint Tracer Bullet:**
-  - **Stage 1 (Tracer Bullet):** Requires **zero external touchpoints**. Assets are compiled directly into C++ constants (`std::string_view` literals) inside `//chrome/browser/obscure/ui/webui/obscure_new_tab_page_ui.cc` and served via `content::WebUIDataSource::AddString()`.
-  - **Runtime Filesystem Read Ban:** Ad-hoc reading of raw HTML/JS files from the filesystem at runtime is strictly prohibited in shipping binaries (incompatible with packaging, sandbox, and performance requirements).
-  - **Stage 2 (Production Packaging):** Packaged via `//chrome/browser/obscure/resources/BUILD.gn` using `build_webui()` into `obscure_resources.pak`, with the single external touchpoint in `chrome/chrome_paks.gni`.
+  - **Stage 1 (Tracer Bullet):** Requires **zero external touchpoints**. Assets are compiled directly into isolated C++ files under `//chrome/browser/obscure/ui/webui/`.
+  - **Accurate `content::WebUIDataSource` API Methods:**
+    - `content::WebUIDataSource::AddString()` is strictly reserved for **i18n string placeholders** (e.g., passing `$i18n{title}` keys to the template).
+    - To serve raw document assets (HTML, CSS, JS), `content::WebUIDataSource` uses `source->SetDefaultResource(resource_id)` or `source->AddResourcePath("launchpad.js", resource_id)`.
+    - For dynamically served in-memory strings, `content::WebUIDataSource` utilizes `base::RefCountedString` via `source->AddResourcePath("launchpad.js", base::MakeRefCounted<base::RefCountedString>(std::move(payload)))` or `source->SetRequestFilter()`.
+  - **Strict Content Security Policy (CSP) Invariants:**
+    - Chromium WebUI enforces strict CSP by default. In accordance with Chromium security standards:
+      1. **No `unsafe-eval`:** Dynamic code execution (`eval()`, `new Function()`) is strictly prohibited.
+      2. **No Inline Scripts:** `<script>` tags embedded inline in HTML violate default WebUI CSP (`script-src 'self' chrome://resources;`). All logic must reside in a separate JavaScript module (`launchpad.js`) loaded via `<script type="module" src="launchpad.js"></script>`.
+      3. **No External Network Dependencies:** Zero CDN links, external Google Fonts, or remote styles. All CSS and fonts must be bundled locally within the WebUI data source.
+      4. **Trusted Types:** WebUI pages must avoid unsafe DOM sinks and use `textContent` exclusively for all dynamic string insertions.
+  - **Runtime Filesystem Read Ban:** Ad-hoc reading of raw HTML/JS files from disk at runtime is strictly prohibited in shipping browser binaries (incompatible with release packaging, sandbox restrictions, and security models).
+  - **Stage 2 (Production Packaging):** Packaged via `//chrome/browser/obscure/resources/BUILD.gn` using `build_webui()` into `obscure_resources.pak`, with the single external touchpoint declared in `chrome/chrome_paks.gni`.
 - **Churn Rating Rationale:** **Low**.
 
 ---

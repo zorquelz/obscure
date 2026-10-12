@@ -1,0 +1,23 @@
+Timestamp (UTC): Mon Oct 12 11:55:33 UTC 2026
+=== COMMAND: git status --short --branch ===
+## obscure-stable-155
+?? build/util/MINIBRANCH
+?? third_party/google-java-format/cipd/
+
+=== COMMAND: git rev-parse HEAD ===
+3ff7ac5a9224be9156d7f8703a06e22890aafd34
+
+=== COMMAND: git rev-parse 155.0.8059.39^{commit} ===
+3ff7ac5a9224be9156d7f8703a06e22890aafd34
+
+=== COMMAND: git describe --tags --exact-match HEAD ===
+155.0.8059.39
+
+=== COMMAND: git tag -l '*obscure*' ===
+obscure-baseline-155.0.8059.39
+
+=== COMMAND: cat chrome/VERSION ===
+MAJOR=155
+MINOR=0
+BUILD=8059
+PATCH=39

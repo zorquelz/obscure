@@ -50,6 +50,7 @@ yarn-error.log*
 
 # Local Scratch & Temporary Logs
 *.log
+!docs/evidence/logs/*.log
 temp/
 tmp/
 scratch/

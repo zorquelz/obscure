@@ -1,0 +1,17 @@
+Timestamp (UTC): Mon Oct 12 11:55:35 UTC 2026
+=== COMMAND: cat out/Stable155/args.gn ===
+is_debug = false
+
+=== COMMAND: ./buildtools/linux64/gn args out/Stable155 --list --short (Key Variables) ===
+dcheck_always_on = true
+is_component_build = false
+is_debug = false
+symbol_level = 0
+use_siso = true
+use_sysroot = true
+
+=== COMMAND: ls -lh out/Stable155/chrome ===
+-rwxr-xr-x 1 lucifer-1403 lucifer-1403 680M Oct 11 16:37 out/Stable155/chrome
+
+=== COMMAND: ./out/Stable155/chrome --version ===
+Chromium 155.0.8059.39 

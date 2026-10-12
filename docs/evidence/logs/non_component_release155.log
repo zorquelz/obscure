@@ -1,0 +1,19 @@
+Timestamp (UTC): Mon Oct 12 11:55:37 UTC 2026
+=== COMMAND: cat out/Release155/args.gn ===
+is_debug = false
+is_component_build = false
+symbol_level = 0
+
+=== COMMAND: ./buildtools/linux64/gn gen out/Release155 ===
+Done. Made 35979 targets from 5065 files in 2816ms
+
+=== COMMAND: ninja -C out/Release155 components/version_info ===
+ninja: Entering directory `out/Release155'
+ninja: no work to do.
+
+=== COMMAND: ls -lh out/Release155/obj/base/version_info/libversion_info.a ===
+-rw-r--r-- 1 lucifer-1403 lucifer-1403 158 Oct 12 10:24 out/Release155/obj/base/version_info/libversion_info.a
+
+=== COMMAND: ls -lh out/Release155/obj/components/version_info/version_info_with_user_agent/ ===
+total 4.0K
+-rw-r--r-- 1 lucifer-1403 lucifer-1403 1.7K Oct 12 10:24 version_info_with_user_agent.o

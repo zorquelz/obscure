@@ -1,0 +1,49 @@
+Timestamp (UTC): Mon Oct 12 11:55:36 UTC 2026
+=== COMMAND: ls -lh out/Stable155/chrome out/Obscure/chrome ===
+-rwxr-xr-x 1 lucifer-1403 lucifer-1403 197M Oct 10 13:23 out/Obscure/chrome
+-rwxr-xr-x 1 lucifer-1403 lucifer-1403 680M Oct 11 16:37 out/Stable155/chrome
+
+=== COMMAND: size out/Stable155/chrome out/Obscure/chrome ===
+   text	   data	    bss	    dec	    hex	filename
+472952461	14787227	2291708	490031396	1d354924	out/Stable155/chrome
+127366619	6352384	 366920	134085923	7fdfd23	out/Obscure/chrome
+
+=== COMMAND: ldd out/Stable155/chrome | wc -l ===
+87
+
+=== COMMAND: ldd out/Obscure/chrome | wc -l ===
+594
+
+=== COMMAND: ldd out/Stable155/chrome (sample) ===
+	linux-vdso.so.1 (0x000071a274a60000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x000071a274a49000)
+	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x000071a274a44000)
+	libglib-2.0.so.0 => /lib/x86_64-linux-gnu/libglib-2.0.so.0 (0x000071a2574b7000)
+	libgobject-2.0.so.0 => /lib/x86_64-linux-gnu/libgobject-2.0.so.0 (0x000071a2749e1000)
+	libnspr4.so => /lib/x86_64-linux-gnu/libnspr4.so (0x000071a2749a2000)
+	libnss3.so => /lib/x86_64-linux-gnu/libnss3.so (0x000071a257388000)
+	libnssutil3.so => /lib/x86_64-linux-gnu/libnssutil3.so (0x000071a27496e000)
+	libsmime3.so => /lib/x86_64-linux-gnu/libsmime3.so (0x000071a25735f000)
+	libgio-2.0.so.0 => /lib/x86_64-linux-gnu/libgio-2.0.so.0 (0x000071a25718f000)
+	libatk-1.0.so.0 => /lib/x86_64-linux-gnu/libatk-1.0.so.0 (0x000071a257165000)
+	libatk-bridge-2.0.so.0 => /lib/x86_64-linux-gnu/libatk-bridge-2.0.so.0 (0x000071a257129000)
+	libdbus-1.so.3 => /lib/x86_64-linux-gnu/libdbus-1.so.3 (0x000071a2570da000)
+	libcups.so.2 => /lib/x86_64-linux-gnu/libcups.so.2 (0x000071a257039000)
+	libexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x000071a25700b000)
+
+=== COMMAND: ldd out/Obscure/chrome (sample) ===
+	linux-vdso.so.1 (0x00007be901510000)
+	libui_ozone.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libui_ozone.so (0x00007be8f8400000)
+	libbase.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libbase.so (0x00007be8f7e00000)
+	libbase_allocator_partition_allocator_src_partition_alloc_raw_ptr.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libbase_allocator_partition_allocator_src_partition_alloc_raw_ptr.so (0x00007be9014fb000)
+	libbase_allocator_partition_allocator_src_partition_alloc_allocator_base.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libbase_allocator_partition_allocator_src_partition_alloc_allocator_base.so (0x00007be9014ea000)
+	libbase_allocator_partition_allocator_src_partition_alloc_allocator_core.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libbase_allocator_partition_allocator_src_partition_alloc_allocator_core.so (0x00007be8f92df000)
+	libbase_allocator_partition_allocator_src_partition_alloc_allocator_shim.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libbase_allocator_partition_allocator_src_partition_alloc_allocator_shim.so (0x00007be9014ce000)
+	libthird_party_abseil-cpp_absl.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libthird_party_abseil-cpp_absl.so (0x00007be8f8304000)
+	libthird_party_boringssl.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libthird_party_boringssl.so (0x00007be8f7a00000)
+	libthird_party_perfetto_libperfetto.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libthird_party_perfetto_libperfetto.so (0x00007be8f7400000)
+	libthird_party_protobuf_protobuf_full_and_lite_library.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libthird_party_protobuf_protobuf_full_and_lite_library.so (0x00007be8f7000000)
+	libmojo_public_cpp_bindings.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libmojo_public_cpp_bindings.so (0x00007be90146d000)
+	libmojo_public_cpp_bindings_bindings_base.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libmojo_public_cpp_bindings_bindings_base.so (0x00007be901443000)
+	libmojo_public_system_cpp.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libmojo_public_system_cpp.so (0x00007be90141e000)
+	libmojo_cpp_platform.so => /home/lucifer-1403/Obscure/chromium/src/out/Obscure/libmojo_cpp_platform.so (0x00007be90140e000)
