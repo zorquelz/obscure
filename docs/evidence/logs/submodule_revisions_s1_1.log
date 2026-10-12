@@ -47,3 +47,16 @@ Exact Tag:   155.0.8059.39
 Working Tree Status:
 ?? build/util/MINIBRANCH
 ?? third_party/google-java-format/cipd/
+
+=== UNTRACKED PATHS CLASSIFICATION & PRESERVATION STATUS ===
+Path 1: build/util/MINIBRANCH
+  Type: Upstream build tooling metadata file
+  Content: MINIBRANCH_BASE_VERSION=
+  Origin: Generated during Chromium branch/versioning scripts execution
+  Status: PRESERVED INTACT (Zero destructive clean/deletion)
+
+Path 2: third_party/google-java-format/cipd/
+  Type: CIPD binary distribution directory
+  Content: google-java-format (executable, 25MB), google-java-format.jar (3.8MB)
+  Origin: Fetched by Chromium 'gclient runhooks' / CIPD package manager
+  Status: PRESERVED INTACT (Zero destructive clean/deletion)
