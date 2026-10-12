@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Obscure — Stage 1 Evidence Inspection Report (S1-1 to S1-8)</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+    @bottom-right {
+      content: counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: #64748b;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    line-height: 1.5;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+
+  .logo-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #0284c7;
+    margin: 0 0 12px 0;
+  }
+
+  .metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 20px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 8.5pt;
+  }
+
+  .metadata-grid div strong {
+    color: #334155;
+    display: inline-block;
+    width: 130px;
+  }
+
+  h2 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 4px;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 10pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .badge-pass { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .badge-blocked { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+  .badge-partial { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px 0;
+    font-size: 8pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+    border: 1px solid #cbd5e1;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  code, pre {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 8pt;
+  }
+
+  code {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 8px 0 12px 0;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    page-break-inside: avoid;
+  }
+
+  .callout {
+    background-color: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 8px 12px;
+    margin: 10px 0;
+    font-size: 8.5pt;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .callout-warn {
+    background-color: #fffbeb;
+    border-left: 4px solid #d97706;
+    padding: 8px 12px;
+    margin: 10px 0;
+    font-size: 8.5pt;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-title">
+    <h1>OBSCURE &mdash; The Builder's Browser</h1>
+    <span style="font-size: 9pt; font-weight: 700; color: #64748b;">ZORQUELZ TECHNOLOGIES</span>
+  </div>
+  <div class="subtitle">Stage 1 Evidence Inspection & Verification Report (S1-1 through S1-8)</div>
+
+  <div class="metadata-grid">
+    <div><strong>Date:</strong> October 12, 2026</div>
+    <div><strong>Control Commit:</strong> <code>2b911f8</code> (feature/pr-1-qa-corrections)</div>
+    <div><strong>Author:</strong> Antigravity (Implementation Lead)</div>
+    <div><strong>Chromium Commit:</strong> <code>3ff7ac5a9...</code> (Tag 155.0.8059.39)</div>
+    <div><strong>Review & QA Lead:</strong> Claude</div>
+    <div><strong>Stage 1 Status:</strong> <span class="badge badge-blocked">BLOCKED &mdash; Pending QA Sign-Off</span></div>
+    <div><strong>Chief Architect:</strong> ChatGPT</div>
+    <div><strong>Stage 2 Status:</strong> <span class="badge badge-blocked">BLOCKED &mdash; ADR 0002 Proposed</span></div>
+  </div>
+</header>
+
+<h2>1. Executive Summary & Gate Invariants</h2>
+<p>This document presents the complete empirical evidence required by Review &amp; QA Lead (Claude) under the controlling Stage 1 acceptance protocol. In strict observance of executive governance:</p>
+<ul>
+  <li><strong>Stage 1 (New Tab Tracer Bullet):</strong> REMAINS 100% BLOCKED. Zero feature code has been written in Chromium.</li>
+  <li><strong>Stage 2 (Project Spaces Persistence):</strong> REMAINS 100% BLOCKED. ADR 0002 remains in Proposed status.</li>
+  <li><strong>Preservation of Artifacts:</strong> The historical Chromium 157 build (<code>out/Obscure</code>) and the compiled Stable 155 build (<code>out/Stable155</code>) remain intact. All compilation and tests were executed strictly inside the WSL2 Ubuntu container without host Windows modifications.</li>
+</ul>
+
+<h2>2. S1-1 &mdash; Dependency Provenance (Actual vs Pinned DEPS)</h2>
+<p>Every major third-party submodule in <code>~/Obscure/chromium/src</code> was inspected using <code>git rev-parse HEAD</code> and verified against the exact pinned revision in <code>DEPS</code> at tag <code>155.0.8059.39</code>.</p>
+
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/submodule_revisions_s1_1.log</code></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Submodule</th>
+      <th>Local Directory</th>
+      <th>Actual Git HEAD in Checkout</th>
+      <th>Pinned Revision in DEPS</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>V8</strong></td>
+      <td><code>v8/</code></td>
+      <td><code>56832c166a78bd1eb61068ac69876d6880eaabdf</code></td>
+      <td><code>56832c166a78bd1eb61068ac69876d6880eaabdf</code></td>
+      <td><span class="badge badge-pass">MATCH (100%)</span></td>
+    </tr>
+    <tr>
+      <td><strong>Skia</strong></td>
+      <td><code>third_party/skia/</code></td>
+      <td><code>29ed1e87a0a50f3d8347e988842d9d59e7573efa</code></td>
+      <td><code>29ed1e87a0a50f3d8347e988842d9d59e7573efa</code></td>
+      <td><span class="badge badge-pass">MATCH (100%)</span></td>
+    </tr>
+    <tr>
+      <td><strong>ANGLE</strong></td>
+      <td><code>third_party/angle/</code></td>
+      <td><code>170484eea03a4255a388072add4232e1fadfbee4</code></td>
+      <td><code>170484eea03a4255a388072add4232e1fadfbee4</code></td>
+      <td><span class="badge badge-pass">MATCH (100%)</span></td>
+    </tr>
+    <tr>
+      <td><strong>WebRTC</strong></td>
+      <td><code>third_party/webrtc/</code></td>
+      <td><code>5bd86a2f17a35dfc986b87d058f511e45805bd1d</code></td>
+      <td><code>5bd86a2f17a35dfc986b87d058f511e45805bd1d</code></td>
+      <td><span class="badge badge-pass">MATCH (100%)</span></td>
+    </tr>
+    <tr>
+      <td><strong>BoringSSL</strong></td>
+      <td><code>third_party/boringssl/src/</code></td>
+      <td><code>b780f192ce515ed8ed358f6c0947bd7acce438b9</code></td>
+      <td><code>b780f192ce515ed8ed358f6c0947bd7acce438b9</code></td>
+      <td><span class="badge badge-pass">MATCH (100%)</span></td>
+    </tr>
+    <tr>
+      <td><strong>DevTools Frontend</strong></td>
+      <td><code>third_party/devtools-frontend/src/</code></td>
+      <td><code>cd7bfad9bba968ac23ba67e538f9e1d499991d25</code></td>
+      <td><code>cd7bfad9bba968ac23ba67e538f9e1d499991d25</code></td>
+      <td><span class="badge badge-pass">MATCH (100%)</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Rust Toolchain Revision:</strong> <code>tools/rust/update_rust.py --print-revision installed</code> confirms revision <code>1edd55dcfcd573872c727fa3e086369a71661ee0-1</code>, perfectly matching DEPS requirements.</p>
+
+<h2>3. S1-2 &mdash; Build Configuration &amp; GN Value Origins</h2>
+<p><strong>Supporting Raw Logs:</strong> <code>docs/evidence/logs/build_args_and_ninja.log</code> &amp; <code>docs/evidence/logs/gn_value_origins_s1_2.log</code></p>
+
+<p>Unedited contents of <code>out/Stable155/args.gn</code>:</p>
+<pre>is_debug = false</pre>
+
+<p>GN value origins evaluated via <code>gn args out/Stable155 --list=&lt;var&gt;</code>:</p>
+<pre>=== is_component_build ===
+Current value (from the default) = false
+  From //build/config/BUILDCONFIG.gn:171
+
+=== dcheck_always_on ===
+Current value (from the default) = true
+  From //build/config/dcheck_always_on.gni:26
+
+=== symbol_level ===
+Current value (from the default) = 0
+  From //build/config/compiler/compiler.gni:161</pre>
+
+<div class="callout">
+  <strong>Technical Proof:</strong> Because <code>//build/config/BUILDCONFIG.gn:171</code> defaults <code>is_component_build</code> to <code>false</code> when <code>is_debug = false</code> and omitted, <code>out/Stable155</code> is a true monolithic non-component release build.
+</div>
+
+<div class="page-break"></div>
+
+<h2>4. S1-3 &mdash; Raw Evidence Verification</h2>
+
+<h3>4.1 Live Kernel Sandbox Evidence (All Renderer PIDs)</h3>
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/sandbox_proc_status.log</code></p>
+<p>Captured via <code>scripts/check_sandbox.py</code> executing <code>./out/Stable155/chrome --headless=new</code> without <code>--no-sandbox</code>:</p>
+<ul>
+  <li><strong>Browser Process (PID 809):</strong> User Namespace: <code>user:[4026531837]</code>, PID Namespace: <code>pid:[4026532220]</code>.</li>
+  <li><strong>Renderer Processes (PIDs 909, 924, 925, 950):</strong>
+    <ul>
+      <li><code>NoNewPrivs: 1</code> (Verified setuid/setgid privilege escalation disabled)</li>
+      <li><code>Seccomp: 2</code>, <code>Seccomp_filters: 1</code> (Verified BPF seccomp syscall filter active)</li>
+      <li><code>User Namespace: user:[4026532319]</code> (Unprivileged user namespace separation)</li>
+      <li><code>PID Namespace: pid:[4026532225..232]</code> (Isolated PID namespaces)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>4.2 Historical Baseline <code>out/Obscure</code> Timestamps</h3>
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/out_obscure_history.log</code></p>
+<p>Complete <code>ls -l --time-style=full-iso out/Obscure/</code> proves all 1,496 build artifacts retain their original <strong>October 10, 2026 11:46 / 13:23 UTC</strong> timestamps. The directory was never modified or overwritten during Stable 155 configuration.</p>
+
+<h3>4.3 Git Reflog &amp; Clean Working Tree</h3>
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/chromium_reflog_and_stash.log</code></p>
+<pre>3ff7ac5a9224b HEAD@{0}: checkout: moving from test-throwaway to obscure-stable-155
+3ff7ac5a9224b HEAD@{1}: checkout: moving from obscure-stable-155 to test-throwaway
+3ff7ac5a9224b HEAD@{2}: checkout: moving from e3a47f1afe3c87307d7b98638a576a5993fb95d7 to obscure-stable-155
+e3a47f1afe3c8 HEAD@{3}: checkout: moving from main to refs/remotes/origin/main
+fc24ae008e4fb HEAD@{4}: clone: from https://chromium.googlesource.com/chromium/src.git
+git stash list: (empty)</pre>
+
+<h3>4.4 TP-06 Interactive GUI Launch Status</h3>
+<div class="callout-warn">
+  <strong>Honest Disclosure / Artifact Gap:</strong> Interactive GUI launch (<code>./out/Obscure/chrome https://zorquelz.com</code>) was visually verified via Wayland WSLg on October 10. However, no graphical screenshot file (<code>.png</code>) was preserved in the repo. Documented as an artifact gap.
+</div>
+
+<h2>5. S1-4 &mdash; Git Workflow &amp; Safeguards</h2>
+<p><strong>Document:</strong> <code>docs/chromium-git-workflow.md</code> (Commit <code>2b911f8</code>)</p>
+<ul>
+  <li><strong>Safe Branch Creation:</strong> Step A roots <code>obscure-stable-155</code> at immutable tag <code>obscure-baseline-155.0.8059.39</code>.</li>
+  <li><strong>Stale-Patch Purge:</strong> Step C mandates <code>rm -f /mnt/f/Zorquelz/Obscure/patches/*.patch</code> prior to <code>git format-patch</code>.</li>
+  <li><strong>Throwaway-Branch Validation:</strong> Step D specifies testing exported patches on a throwaway branch (<code>git checkout -b throwaway-verify ... &amp;&amp; git am ... &amp;&amp; ninja ... &amp;&amp; git branch -D throwaway-verify</code>).</li>
+  <li><strong>Line Feed Normalization:</strong> <code>.gitattributes</code> enforces <code>* text=auto eol=lf</code> and <code>*.patch text eol=lf</code>.</li>
+  <li><strong>Rollback Safeguards:</strong> Section 4 strictly bans <code>git clean -ffd</code> and <code>gclient sync -D</code>.</li>
+</ul>
+
+<h2>6. S1-5 &mdash; HK-04 WebUI API &amp; Strict CSP Compliance</h2>
+<p><strong>Supporting Raw Log:</strong> <code>docs/evidence/logs/hooks_grep_evidence.log</code></p>
+<p>Verbatim signatures from <code>content/public/browser/web_ui_data_source.h</code>:</p>
+<pre>// Reserved for localized i18n template placeholders:
+virtual void AddString(std::string_view name, std::u16string_view value) = 0;
+
+// Used to serve bundled assets:
+virtual void AddResourcePath(std::string_view path, int resource_id) = 0;
+virtual void SetDefaultResource(int resource_id) = 0;
+
+// Content Security Policy overrides:
+virtual void OverrideContentSecurityPolicy(
+    network::mojom::CSPDirectiveName directive,
+    const std::string& custom_value) = 0;</pre>
+
+<p><strong>CSP Invariants:</strong> Adheres strictly to standard WebUI CSP (<code>script-src chrome://resources 'self';</code>). No <code>unsafe-eval</code>, zero inline <code>&lt;script&gt;</code> tags (separate <code>launchpad.js</code> module), zero remote CDNs, and exclusive use of <code>textContent</code> for string bindings.</p>
+
+<div class="page-break"></div>
+
+<h2>7. S1-6 &mdash; Tested Rollback Procedures</h2>
+<p><strong>Tested Bundle Verification in WSL2:</strong></p>
+<pre>$ cd ~/Obscure/chromium/src
+$ git bundle create /mnt/f/Zorquelz/Obscure/backups/test-backup.bundle -5 HEAD
+$ git bundle verify /mnt/f/Zorquelz/Obscure/backups/test-backup.bundle
+The bundle contains this ref:
+3ff7ac5a9224be9156d7f8703a06e22890aafd34 HEAD
+The bundle uses this hash algorithm: sha1
+/mnt/f/Zorquelz/Obscure/backups/test-backup.bundle is okay</pre>
+
+<p><strong>Control Repo Rollback:</strong> <code>git checkout feature/pr-1-qa-corrections &amp;&amp; git reset --hard 7b0eed2</code></p>
+<p><strong>Chromium Tree Rollback:</strong> <code>git branch backup-$(date +%s) &amp;&amp; git reset --hard obscure-baseline-155.0.8059.39</code></p>
+
+<h2>8. S1-7 &mdash; Security-Fix Count &amp; Repository Search</h2>
+<ul>
+  <li><strong>Official Permalink:</strong> <a href="https://chromereleases.googleblog.com/2026/10/stable-channel-update-for-desktop.html">Chrome Releases Blog &mdash; Stable Channel Update for Desktop (October 6, 2026)</a></li>
+  <li><strong>Verbatim Text:</strong> <em>&ldquo;This update includes 247 security fixes. Below, we highlight fixes that were contributed by external researchers.&rdquo;</em></li>
+  <li><strong>Repository Search:</strong> A complete ripgrep search confirms <code>247</code> occurs as a documentation claim exclusively in lines 18&ndash;19 of <code>docs/evidence/chromium-stable-155-source-audit.md</code>. All other hits in the repository are timestamps and file offsets in raw logs.</li>
+</ul>
+
+<h2>9. S1-8 &mdash; Test Plan 0003 &amp; Acceptance Tests</h2>
+<p><strong>Document:</strong> <code>docs/test-plans/0003-stage1-tracer-bullet.md</code> (Commit <code>af5f4fb</code>)</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Acceptance Test Scope</th>
+      <th>Execution Status</th>
+      <th>Pass / Gate Criteria</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>TB-01</strong></td>
+      <td>Tab Strip "+" button opens Launchpad</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Stage 1 implementation gated</td>
+    </tr>
+    <tr>
+      <td><strong>TB-02</strong></td>
+      <td>Keyboard shortcut <code>Ctrl+T</code></td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Stage 1 implementation gated</td>
+    </tr>
+    <tr>
+      <td><strong>TB-03</strong></td>
+      <td>New Window <code>Ctrl+N</code> opens Launchpad</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Stage 1 implementation gated</td>
+    </tr>
+    <tr>
+      <td><strong>TB-04</strong></td>
+      <td>Direct Omnibox rewrite (<code>chrome://newtab</code>)</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Stage 1 implementation gated</td>
+    </tr>
+    <tr>
+      <td><strong>TB-05</strong></td>
+      <td>Incognito Isolation (default incognito splash)</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Zero Obscure UI rendered in incognito</td>
+    </tr>
+    <tr>
+      <td><strong>TB-06</strong></td>
+      <td>Guest Profile Isolation (default guest splash)</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Zero Obscure UI rendered in guest</td>
+    </tr>
+    <tr>
+      <td><strong>TB-07</strong></td>
+      <td>Content Security Policy (0 console errors)</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Zero CSP violations; no unsafe-eval</td>
+    </tr>
+    <tr>
+      <td><strong>TB-08</strong></td>
+      <td>Active Sandbox Invariant</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>Verified in <code>sandbox_proc_status.log</code></td>
+    </tr>
+    <tr>
+      <td><strong>TB-09</strong></td>
+      <td>Alternative Search Engine Default</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+      <td>Launchpad retains control</td>
+    </tr>
+    <tr>
+      <td><strong>TB-10</strong></td>
+      <td>Throwaway-Branch Revert Test</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>Tested in WSL2; 100% clean baseline return</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>10. Concise Gap Matrix (Claude's S1-1 to S1-8)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Condition</th>
+      <th>Description</th>
+      <th>Status</th>
+      <th>Identified Gaps &amp; Disclosures</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>S1-1</strong></td>
+      <td>Dependency Provenance</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>None. All 6 submodules and Rust toolchain match DEPS 100%.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-2</strong></td>
+      <td>Build Configuration &amp; GN Origins</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>None. Verified monolithic non-component via <code>BUILDCONFIG.gn:171</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-3</strong></td>
+      <td>Raw Evidence Logs</td>
+      <td><span class="badge badge-partial">PARTIAL</span></td>
+      <td>12 raw logs committed. <strong>Gap:</strong> TP-06 GUI launch verified interactively, but screenshot image was not preserved.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-4</strong></td>
+      <td>Git Workflow Specification</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>None. Stale-patch purge, throwaway branches, and safe bundles committed.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-5</strong></td>
+      <td>HK-04 API &amp; CSP Evidence</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>None. Verified against Stable 155 headers; strict WebUI CSP specified.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-6</strong></td>
+      <td>Rollback Instructions &amp; Testing</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>None. Non-destructive bundle backup tested and verified.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-7</strong></td>
+      <td>Security-Fix Count Labeling</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>None. Official permalink provided; repo search proves accurate citation.</td>
+    </tr>
+    <tr>
+      <td><strong>S1-8</strong></td>
+      <td>Test Plan 0003 Acceptance</td>
+      <td><span class="badge badge-blocked">GATED</span></td>
+      <td>Specification committed. Acceptance tests TB-01..07 blocked until Stage 1 clearance.</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
