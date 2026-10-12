@@ -20,14 +20,17 @@ The Stage 1 New Tab Tracer Bullet serves as the minimal end-to-end integration p
 ### Explicit Inclusions (Tracer Bullet Scope)
 1. **Isolated Module Scaffolding:** Placement of isolated C++ files under `chrome/browser/obscure/` linked via `chrome/browser/BUILD.gn` (HK-02).
 2. **WebUI Configuration Registration:** Substitution of `NewTabPageUIConfig` on `chrome::kChromeUINewTabPageHost` ("new-tab-page") inside `chrome/browser/ui/webui/chrome_web_ui_configs.cc` (HK-01).
-3. **WebUI Data Source:** Creation of `content::WebUIDataSource` serving bundled HTML, CSS, and JS assets for the Obscure Launchpad UI (HK-04).
+3. **WebUI Data Source:** Creation of `content::WebUIDataSource` serving bundled static HTML, CSS, and JS assets for the Obscure Launchpad UI (HK-04).
 4. **Strict WebUI CSP Compliance:** Adherence to Chromium WebUI Content Security Policy rules (no inline scripts, no `unsafe-eval`, separate static `.js` bundle, trusted local resources only).
+5. **Patch Size Constraint:** Total external diff footprint outside `//chrome/browser/obscure/` must strictly not exceed **10 lines** (HK-01: ~3 lines; HK-02: ~2 lines).
 
 ### Explicit Exclusions (Strictly Prohibited in Stage 1)
 1. **ZERO Native Persistence:** No reading or writing of `obscure_spaces.json`. No `ImportantFileWriter`. No disk I/O.
-2. **ZERO KeyedService Registration:** `ObscureWorkspaceService` and `ObscureWorkspaceServiceFactory` are deferred to Stage 2.
-3. **ZERO Storage Partitioning:** No multi-profile or container isolation hacks.
-4. **ZERO External Network Requests:** The Launchpad WebUI must make zero outbound requests to external CDNs or analytics.
+2. **ZERO Mojo IPC State:** No Mojo interfaces or message receivers.
+3. **ZERO Project Spaces DB / State Management:** No space creation, deletion, tab stashing, or workspace models.
+4. **ZERO KeyedService Registration:** `ObscureWorkspaceService` and `ObscureWorkspaceServiceFactory` are deferred to Stage 2.
+5. **ZERO Storage Partitioning:** No multi-profile or container isolation hacks.
+6. **ZERO External Network Requests:** The Launchpad WebUI must make zero outbound requests to external CDNs or analytics.
 
 ---
 
