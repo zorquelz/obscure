@@ -57,8 +57,34 @@ for name, path in modules:
                 break
 
     match_status = "MATCH" if actual_rev == pinned_rev else "MISMATCH / DIFF"
+    
+    # Working tree cleanliness check
+    status_out = "CLEAN"
+    if os.path.isdir(full_path):
+        try:
+            raw_st = subprocess.check_output(
+                ["git", "status", "--short"], cwd=full_path, text=True
+            ).strip()
+            status_out = "CLEAN (0 modifications)" if not raw_st else f"DIRTY: {raw_st}"
+        except Exception as e:
+            status_out = f"Status check error: {e}"
+
     print(f"Submodule: {name}")
     print(f"  Path: {path}")
     print(f"  Actual Revision: {actual_rev}")
     print(f"  Pinned in DEPS:  {pinned_rev}")
-    print(f"  Status:          {match_status}\n")
+    print(f"  Revision Status: {match_status}")
+    print(f"  Working Tree:    {status_out}\n")
+
+# Root checkout status
+print("=== ROOT CHROMIUM CHECKOUT STATUS ===")
+try:
+    root_branch = subprocess.check_output(["git", "branch", "--show-current"], cwd=src_dir, text=True).strip()
+    root_tag = subprocess.check_output(["git", "describe", "--tags", "--exact-match", "HEAD"], cwd=src_dir, text=True).strip()
+    root_status = subprocess.check_output(["git", "status", "--short"], cwd=src_dir, text=True).strip()
+    print(f"Root Branch: {root_branch}")
+    print(f"Exact Tag:   {root_tag}")
+    print(f"Working Tree Status:\n{root_status if root_status else 'CLEAN'}")
+except Exception as e:
+    print(f"Root check error: {e}")
+

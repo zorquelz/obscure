@@ -1,38 +1,49 @@
-Timestamp (UTC): Mon Oct 12 12:21:03 UTC 2026
 === S1-1: SUBMODULE REVISION AUDIT (ACTUAL VS PINNED DEPS) ===
 Submodule: V8
   Path: v8
   Actual Revision: 56832c166a78bd1eb61068ac69876d6880eaabdf
   Pinned in DEPS:  56832c166a78bd1eb61068ac69876d6880eaabdf
-  Status:          MATCH
+  Revision Status: MATCH
+  Working Tree:    CLEAN (0 modifications)
 
 Submodule: Skia
   Path: third_party/skia
   Actual Revision: 29ed1e87a0a50f3d8347e988842d9d59e7573efa
   Pinned in DEPS:  29ed1e87a0a50f3d8347e988842d9d59e7573efa
-  Status:          MATCH
+  Revision Status: MATCH
+  Working Tree:    CLEAN (0 modifications)
 
 Submodule: ANGLE
   Path: third_party/angle
   Actual Revision: 170484eea03a4255a388072add4232e1fadfbee4
   Pinned in DEPS:  170484eea03a4255a388072add4232e1fadfbee4
-  Status:          MATCH
+  Revision Status: MATCH
+  Working Tree:    CLEAN (0 modifications)
 
 Submodule: WebRTC
   Path: third_party/webrtc
   Actual Revision: 5bd86a2f17a35dfc986b87d058f511e45805bd1d
   Pinned in DEPS:  5bd86a2f17a35dfc986b87d058f511e45805bd1d
-  Status:          MATCH
+  Revision Status: MATCH
+  Working Tree:    CLEAN (0 modifications)
 
 Submodule: BoringSSL
   Path: third_party/boringssl/src
   Actual Revision: b780f192ce515ed8ed358f6c0947bd7acce438b9
   Pinned in DEPS:  b780f192ce515ed8ed358f6c0947bd7acce438b9
-  Status:          MATCH
+  Revision Status: MATCH
+  Working Tree:    CLEAN (0 modifications)
 
 Submodule: DevTools Frontend
   Path: third_party/devtools-frontend/src
   Actual Revision: cd7bfad9bba968ac23ba67e538f9e1d499991d25
   Pinned in DEPS:  cd7bfad9bba968ac23ba67e538f9e1d499991d25
-  Status:          MATCH
+  Revision Status: MATCH
+  Working Tree:    CLEAN (0 modifications)
 
+=== ROOT CHROMIUM CHECKOUT STATUS ===
+Root Branch: obscure-stable-155
+Exact Tag:   155.0.8059.39
+Working Tree Status:
+?? build/util/MINIBRANCH
+?? third_party/google-java-format/cipd/

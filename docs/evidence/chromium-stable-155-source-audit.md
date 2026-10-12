@@ -70,22 +70,26 @@ PATCH=39
 - **Targets Compiled:** `54,376` targets completed in ~1 hour 28 minutes on Ryzen 9 9900X (20 threads).
 - **Executable Version:** `./out/Stable155/chrome --version` reports **`Chromium 155.0.8059.39`**.
 
-### Build Arguments & Configuration Audit
-- **Supporting Raw Log:** [`docs/evidence/logs/build_args_and_ninja.log`](file:///f:/Zorquelz/Obscure/docs/evidence/logs/build_args_and_ninja.log)
+### Build Arguments, Configuration & Value Origins Audit
+- **Supporting Raw Logs:** [`docs/evidence/logs/build_args_and_ninja.log`](file:///f:/Zorquelz/Obscure/docs/evidence/logs/build_args_and_ninja.log) & [`docs/evidence/logs/gn_value_origins_s1_2.log`](file:///f:/Zorquelz/Obscure/docs/evidence/logs/gn_value_origins_s1_2.log)
 ```bash
 $ cat out/Stable155/args.gn
 is_debug = false
 ```
 
-Running `gn args out/Stable155 --list --short` reveals key resolved variables:
+Running `gn args out/Stable155 --list --short` reveals key resolved variables and their origins:
 ```gn
-dcheck_always_on = true
-is_component_build = false
-is_debug = false
-symbol_level = 0
+dcheck_always_on = true    # Default from //build/config/dcheck_always_on.gni:26
+is_component_build = false  # Default from //build/config/BUILDCONFIG.gn:171
+is_debug = false            # Set in args.gn
+symbol_level = 0            # Default from //build/config/compiler/compiler.gni:161
 use_siso = true
 use_sysroot = true
 ```
+
+#### Build Classification (DCHECK-Enabled Development/Verification Build)
+- **Classification:** `out/Stable155` is explicitly classified as a **DCHECK-enabled development/verification build**, NOT release evidence. Because `dcheck_always_on = true` is enabled by default in this configuration, runtime debug assertions remain compiled in. It serves as our development verification baseline.
+- **Production Non-Component Release Target:** `out/Release155` is maintained as the production release configuration target (`is_debug = false`, `is_component_build = false`, `symbol_level = 0`, and `dcheck_always_on = false`), verified via GN generation and smoke compilation (see Section 4). Existing builds remain intact.
 
 ### Technical Settlement of Binary Size Discrepancy (680 MB vs 197 MB)
 - **Supporting Raw Log:** [`docs/evidence/logs/binary_size_and_ldd.log`](file:///f:/Zorquelz/Obscure/docs/evidence/logs/binary_size_and_ldd.log)
