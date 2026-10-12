@@ -28,10 +28,10 @@ upstream/origin/main
 
 Because development spans the Windows 11 host (where the Obscure control repository resides) and the WSL2 Ubuntu environment (where Chromium is built), CRLF line endings can corrupt patch application (`git am`).
 
-The Obscure control repository enforces strict Unix line feeds (LF) via `.gitattributes`:
+The Obscure control repository enforces strict line ending rules via `.gitattributes`:
 ```gitattributes
 * text=auto eol=lf
-*.patch text eol=lf
+*.patch -text
 *.cc text eol=lf
 *.h text eol=lf
 *.gn text eol=lf
@@ -39,23 +39,33 @@ The Obscure control repository enforces strict Unix line feeds (LF) via `.gitatt
 *.json text eol=lf
 *.md text eol=lf
 ```
+*(Note: `*.patch -text` is mandatory to treat patch files as binary/verbatim streams, preventing CRLF translation from corrupting patch hunk headers and line counts during `git am`.)*
 
 ---
 
 ## 3. Standard Operating Procedures in WSL2
 
-### Step A: Verify Pinned Baseline & Establish Baseline Tag
+### Step A: Verify Pinned Baseline & Establish Baseline Tag Safely
 ```bash
 cd ~/Obscure/chromium/src
 
-# 1. Ensure on pinned commit
+# 1. Ensure working tree is clean before any branch operations
+git status --short
+
+# 2. Ensure on pinned commit
 git checkout 3ff7ac5a9224be9156d7f8703a06e22890aafd34
 
-# 2. Establish local immutable baseline tag if not present
+# 3. Establish local immutable baseline tag if not present
 git tag -a obscure-baseline-155.0.8059.39 3ff7ac5a9224be9156d7f8703a06e22890aafd34 -m "Obscure Stable 155 Immutable Baseline"
 
-# 3. Create or checkout dedicated development branch
-git checkout -B obscure-stable-155 obscure-baseline-155.0.8059.39
+# 4. Create or checkout dedicated development branch safely
+# SAFEGUARD INVARIANT: NEVER use 'git checkout -B'. The uppercase '-B' switch forcibly
+# resets/clobbers an existing branch to the start point, silently destroying existing work.
+if git show-ref --verify --quiet refs/heads/obscure-stable-155; then
+  git checkout obscure-stable-155
+else
+  git checkout -b obscure-stable-155 obscure-baseline-155.0.8059.39
+fi
 ```
 
 ### Step B: Developing & Committing Custom Code
