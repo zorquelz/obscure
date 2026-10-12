@@ -1,13 +1,21 @@
-# Chromium 157 Source Tree Evidence & Audit Report
+# [SUPERSEDED] Chromium 157 Source Tree Evidence & Audit Report
 **Zorquelz Technologies | Engineering & Implementation Lead (Antigravity)**  
-**Date:** October 11, 2026  
+**Date:** October 11, 2026 (Superseded: October 12, 2026)  
 **Target Repository:** `~/Obscure/chromium/src` (WSL2 `Obscure-Ubuntu`)
+
+> [!WARNING]
+> **SUPERSEDED HISTORICAL EVIDENCE**:
+> This document records the initial source audit performed against Chromium tip-of-tree trunk (`157.0.8083.0` / Commit `e3a47f1afe3c87307d7b98638a576a5993fb95d7`). 
+> Following executive review and CEO directive on October 12, 2026, **Obscure uses official Chromium Stable only**. Trunk is rejected as a release baseline.
+> 
+> The active, production-grade baseline is **Chromium Stable `155.0.8059.39`** (`3ff7ac5a9224be9156d7f8703a06e22890aafd34`).
+> For active audit evidence, see [`docs/evidence/chromium-stable-155-source-audit.md`](./chromium-stable-155-source-audit.md).
 
 ---
 
-## 1. Revision & Baseline Verification
+## 1. Revision & Baseline Verification (Historical Trunk)
 
-Every entry in this report was verified against the active Chromium source checkout via terminal execution on October 11, 2026.
+Every entry in this section was verified against the active Chromium source checkout on October 11, 2026 prior to the Stable transition.
 
 ### Git Baseline Commands & Output
 ```bash
@@ -31,14 +39,6 @@ MINOR=0
 BUILD=8083
 PATCH=0
 ```
-
-### Channel & Stability Analysis
-- **Status:** **Pre-Stable / Trunk (Canary/Dev branch)**.
-- **Why this revision exists in checkout:** `depot_tools` `fetch --nohooks chromium` syncs `origin/main` by default unless explicitly pinned with `--version` or checkout tag.
-- **Implications for Obscure:**
-  - Modern C++20/C++23 features and modern Chromium modular patterns (`content::WebUIConfigMap`) are active.
-  - Trunk code undergoes daily churn upstream. To maintain reproducible builds, our build is frozen to pinned commit `e3a47f1afe3c87307d7b98638a576a5993fb95d7`.
-  - A formal rebase rehearsal onto a newer milestone tag is required before November 14, 2026.
 
 ---
 
@@ -98,63 +98,8 @@ In `base/files/important_file_writer.h` (line 79):
   2. Rotate backup only **after** the replacement file has been verified on disk.
   3. Validate JSON schema version on load; if corrupted, fallback to `.bak` automatically.
 
-### File Permissions & Path Resolution
-- **Profile Path API:** `chrome/browser/profiles/profile.h` line 210:
-  ```cpp
-  base::FilePath GetPath() const override = 0;
-  ```
-  Path: `profile->GetPath().Append(FILE_PATH_LITERAL("obscure_spaces.json"))`.
-- **POSIX Permissions:** `base/files/file_util.h` line 385:
-  ```cpp
-  BASE_EXPORT bool SetPosixFilePermissions(const FilePath& path, int mode);
-  ```
-  Enforces `0600` (`base::FILE_PERMISSION_READ_BY_USER | base::FILE_PERMISSION_WRITE_BY_USER`) on Linux.
-
 ---
 
-## 4. WebUI Registration & NTP Override (Exact Source Lines)
-
-### WebUI Registration Architecture in Chromium 157
-In modern Chromium (v157), WebUI pages do NOT register via the legacy `ChromeWebUIControllerFactory`. They use `content::WebUIConfigMap`.
-
-Verified in `chrome/browser/ui/webui/chrome_web_ui_configs.cc`:
-- Line 250: `void RegisterChromeWebUIConfigs()`
-- Line 267: `auto& map = content::WebUIConfigMap::GetInstance();`
-- Line 335: `map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());`
-- Line 464: `map.AddWebUIConfig(std::make_unique<SandboxInternalsUIConfig>());` (serves `chrome://sandbox`)
-
-### Verified Line Evidence for Build & Lifecycle Hooks
-- **HK-02 (Build Target Dependency):** `chrome/browser/BUILD.gn` lines 1081–1095:
-  ```gn
-  "//chrome/browser/ui/webui:configs",
-  "//chrome/browser/ui/webui:log_web_ui_url",
-  "//chrome/browser/ui/webui/actor_internals",
-  "//chrome/browser/ui/webui/bluetooth_internals",
-  "//chrome/browser/ui/webui/chrome_urls",
-  "//chrome/browser/ui/webui/connectors_internals",
-  ```
-- **HK-03 (Keyed Service Factory):** `chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc` lines 1599–1605:
-  ```cpp
-  WebDataServiceFactory::GetInstance();
-  webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
-  ```
-
----
-
-## 5. Linux Sandbox Status & Interactive Launch (TP-05)
-
-### Exact Interactive Launch Command (TP-05)
-```bash
-$ ./out/Obscure/chrome https://zorquelz.com
-```
-- **Execution Context:** Launched in Ubuntu 24.04 LTS running under WSL2 with WSLg (Wayland/XWayland display server).
-- **Flags Used:** **Zero sandbox-disabling flags**. No `--no-sandbox`, no `--disable-gpu-sandbox`.
-- **Observed Behavior:** Window initialized, connected to Wayland display, rendered `https://zorquelz.com` with working TLS, DOM, and JavaScript execution.
-
-### Headless Sandboxed Execution Verification (TP-04)
-```bash
-$ ./out/Obscure/chrome --headless=new --dump-dom https://example.com
-```
-- **Result:** **Success.** Exit code `0`. Rendered full HTML DOM of `https://example.com`.
-- **Sandbox Verdict:** The standard Chromium Layer-1 (User Namespaces) and Layer-2 (BPF seccomp) sandbox is fully operational in this environment.
-- **Rule:** `--no-sandbox` is strictly prohibited from all release and testing workflows.
+## 4. Historical Reference to `out/Obscure` Build
+- On October 10, 2026, a component build (`is_component_build=true`) of Chromium 157 was compiled into `out/Obscure` (56,726 steps).
+- This binary (`out/Obscure/chrome`, 197 MB) remains preserved intact on disk as a historical comparison point and rollback reference.

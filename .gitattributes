@@ -1,0 +1,13 @@
+# Enforce LF endings across all text files
+* text=auto eol=lf
+
+# Explicit syntax overrides
+*.md text eol=lf
+*.cc text eol=lf
+*.h text eol=lf
+*.gn text eol=lf
+*.gni text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.patch text eol=lf
