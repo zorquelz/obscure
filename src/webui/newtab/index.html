@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Obscure — The Builder's Browser</title>
+<link rel="stylesheet" href="launchpad.css">
+</head>
+<body>
+  <div class="cockpit">
+    <header class="header">
+      <div class="brand">
+        <span class="logo-glyph">&gt;_</span>
+        <h1 class="brand-title">OBSCURE</h1>
+        <span class="badge">BUILDER COCKPIT</span>
+      </div>
+      <div class="system-status">
+        <span class="status-indicator"></span>
+        <span class="status-text">SANDBOX ACTIVE // STABLE 155</span>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="card space-hero">
+        <h2>Launchpad &amp; Project Spaces</h2>
+        <p class="subtitle">Developer environment cockpit. Multi-process security active.</p>
+        <div class="quick-actions">
+          <button class="btn btn-primary" id="btn-default-space">Default Space</button>
+          <button class="btn btn-secondary" id="btn-inspect-ports">Port Inspector (3000, 8080)</button>
+        </div>
+      </section>
+
+      <section class="card env-telemetry">
+        <h3>Architecture Invariants</h3>
+        <ul class="telemetry-list">
+          <li><strong>Engine:</strong> Chromium Stable 155.0.8059.39</li>
+          <li><strong>Process:</strong> Sandboxed Renderer (Seccomp-BPF)</li>
+          <li><strong>CSP Status:</strong> Strict (Zero Inline Script)</li>
+          <li><strong>Persistence:</strong> Gated (Stage 2 ADR 0002)</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>ZORQUELZ TECHNOLOGIES &copy; 2026</span>
+    </footer>
+  </div>
+  <script type="module" src="launchpad.js"></script>
+</body>
+</html>

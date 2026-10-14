@@ -1,0 +1,22 @@
+# Obscure Browser - Isolated Native Module GN Definition
+# Zorquelz Technologies
+# Target Baseline: Chromium Stable 155.0.8059.39
+
+source_set("obscure") {
+  sources = [
+    "ui/webui/obscure_new_tab_page_ui.cc",
+    "ui/webui/obscure_new_tab_page_ui.h",
+    "ui/webui/obscure_new_tab_page_ui_config.cc",
+    "ui/webui/obscure_new_tab_page_ui_config.h",
+  ]
+
+  deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//chrome/common",
+    "//content/public/browser",
+    "//services/network/public/mojom",
+    "//ui/base",
+    "//url",
+  ]
+}
