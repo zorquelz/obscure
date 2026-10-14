@@ -2,88 +2,141 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Obscure — Stage 1 Tracer Bullet Engineering &amp; Reverse-Engineering Guide</title>
+<title>Obscure — Stage 1 Tracer Bullet Founder Study Notes</title>
 <style>
   @page {
     size: A4;
-    margin: 18mm 14mm 18mm 14mm;
+    margin: 16mm 14mm 16mm 14mm;
     @bottom-right {
-      content: counter(page) " of " counter(pages);
+      content: "Page " counter(page) " of " counter(pages);
       font-size: 8pt;
-      color: #64748b;
+      font-weight: 600;
+      color: #94a3b8;
     }
+  }
+
+  * {
+    box-sizing: border-box;
   }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #0f172a;
-    line-height: 1.45;
-    font-size: 9pt;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.5;
+    font-size: 8.8pt;
     margin: 0;
     padding: 0;
   }
 
+  /* Header & Banner */
   header {
     border-bottom: 2px solid #0284c7;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
     margin-bottom: 14px;
   }
 
-  .logo-title {
+  .header-top {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
+    margin-bottom: 4px;
   }
 
-  h1 {
-    font-size: 16pt;
+  .brand-logo {
+    font-size: 15pt;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #0f172a;
+  }
+
+  .brand-logo span {
+    color: #0284c7;
+  }
+
+  .doc-tag {
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+  }
+
+  .doc-title {
+    font-size: 13pt;
     font-weight: 800;
     color: #0f172a;
-    margin: 0 0 3px 0;
-    letter-spacing: -0.5px;
+    margin: 0 0 4px 0;
   }
 
-  .subtitle {
-    font-size: 10pt;
-    font-weight: 600;
-    color: #0284c7;
-    margin: 0 0 8px 0;
+  .doc-subtitle {
+    font-size: 9pt;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 10px;
   }
 
-  .metadata-grid {
+  /* Quick Summary Strip */
+  .meta-strip {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 5px 14px;
-    background-color: #f8fafc;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     padding: 8px 12px;
-    font-size: 8pt;
+    margin-bottom: 14px;
   }
 
-  .metadata-grid div strong {
-    color: #334155;
-    display: inline-block;
-    width: 140px;
+  .meta-item {
+    font-size: 7.8pt;
   }
 
-  h2 {
-    font-size: 11pt;
-    font-weight: 700;
+  .meta-label {
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 6.8pt;
+    margin-bottom: 2px;
+  }
+
+  .meta-val {
     color: #0f172a;
-    border-bottom: 1px solid #cbd5e1;
+    font-weight: 700;
+  }
+
+  /* Typography */
+  h2 {
+    font-size: 10.5pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 14px 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1.5px solid #e2e8f0;
     padding-bottom: 3px;
-    margin-top: 16px;
-    margin-bottom: 6px;
     page-break-after: avoid;
   }
 
+  h2 .section-num {
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 7.5pt;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
   h3 {
-    font-size: 9.5pt;
+    font-size: 9pt;
     font-weight: 700;
-    color: #1e293b;
-    margin-top: 10px;
-    margin-bottom: 4px;
+    color: #334155;
+    margin: 8px 0 4px 0;
     page-break-after: avoid;
   }
 
@@ -91,32 +144,126 @@
     margin: 0 0 6px 0;
   }
 
-  ul, ol {
-    margin: 3px 0 6px 0;
-    padding-left: 18px;
+  /* Study Note Cards */
+  .note-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    page-break-inside: avoid;
   }
 
-  li {
+  .note-card-highlight {
+    border-left: 3.5px solid #0284c7;
+    background: #f8fafc;
+  }
+
+  .note-card-security {
+    border-left: 3.5px solid #10b981;
+    background: #f0fdf4;
+  }
+
+  .note-card-warning {
+    border-left: 3.5px solid #f59e0b;
+    background: #fffbeb;
+  }
+
+  .card-title {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Workflow Steps */
+  .step-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 8px 0;
+    page-break-inside: avoid;
+  }
+
+  .step-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 7.5pt;
+  }
+
+  .step-header {
+    font-weight: 800;
+    color: #0284c7;
+    font-size: 7.2pt;
+    text-transform: uppercase;
     margin-bottom: 2px;
   }
 
+  .step-title {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+  }
+
+  .step-desc {
+    color: #475569;
+    line-height: 1.35;
+  }
+
+  /* Annotated Snippets */
+  .snippet-box {
+    background: #0f172a;
+    color: #f8fafc;
+    border-radius: 5px;
+    padding: 7px 10px;
+    margin: 4px 0 6px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 7.2pt;
+    line-height: 1.35;
+    overflow-x: auto;
+    page-break-inside: avoid;
+  }
+
+  .snippet-box .comment { color: #64748b; font-style: italic; }
+  .snippet-box .keyword { color: #38bdf8; font-weight: 600; }
+  .snippet-box .type { color: #4ade80; }
+  .snippet-box .func { color: #fbbf24; }
+  .snippet-box .string { color: #f472b6; }
+
+  /* Annotation List */
+  .annotation-list {
+    margin: 3px 0 6px 0;
+    padding-left: 14px;
+    font-size: 7.8pt;
+    color: #334155;
+  }
+
+  .annotation-list li {
+    margin-bottom: 2px;
+  }
+
+  /* Badges & Tables */
   .badge {
     display: inline-block;
-    padding: 2px 6px;
-    font-size: 6.8pt;
+    padding: 2px 5px;
+    font-size: 6.5pt;
     font-weight: 700;
-    border-radius: 4px;
+    border-radius: 3px;
     text-transform: uppercase;
   }
 
   .badge-pass { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
   .badge-blocked { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-  .badge-ready { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+  .badge-shim { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: 6px 0 10px 0;
+    margin: 6px 0 8px 0;
     font-size: 7.5pt;
     page-break-inside: avoid;
   }
@@ -138,48 +285,26 @@
     background-color: #f8fafc;
   }
 
-  code, pre {
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-size: 7.5pt;
-  }
-
-  code {
-    background-color: #f1f5f9;
-    color: #0f172a;
-    padding: 1px 3px;
-    border-radius: 3px;
-    border: 1px solid #e2e8f0;
-  }
-
-  pre {
-    background-color: #0f172a;
-    color: #f8fafc;
-    padding: 8px 10px;
+  .q-block {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
     border-radius: 5px;
-    overflow-x: auto;
-    margin: 5px 0 8px 0;
-    line-height: 1.3;
-    white-space: pre-wrap;
-    word-break: break-all;
+    padding: 8px 10px;
+    margin-bottom: 6px;
     page-break-inside: avoid;
   }
 
-  .callout {
-    background-color: #f0fdf4;
-    border-left: 3px solid #16a34a;
-    padding: 6px 10px;
-    margin: 6px 0;
-    font-size: 8pt;
-    border-radius: 0 4px 4px 0;
+  .q-title {
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 8.2pt;
+    margin-bottom: 3px;
   }
 
-  .callout-info {
-    background-color: #eff6ff;
-    border-left: 3px solid #2563eb;
-    padding: 6px 10px;
-    margin: 6px 0;
-    font-size: 8pt;
-    border-radius: 0 4px 4px 0;
+  .q-answer {
+    color: #334155;
+    font-size: 7.8pt;
+    line-height: 1.4;
   }
 
   .page-break {
@@ -190,191 +315,238 @@
 <body>
 
 <header>
-  <div class="logo-title">
-    <h1>OBSCURE &mdash; The Builder's Browser</h1>
-    <span style="font-size: 8pt; font-weight: 700; color: #64748b;">ZORQUELZ TECHNOLOGIES</span>
+  <div class="header-top">
+    <div class="brand-logo">OBSCURE <span>//</span> ARCHITECTURE NOTES</div>
+    <div class="doc-tag">FOUNDER STUDY GUIDE &bull; STAGE 1</div>
   </div>
-  <div class="subtitle">Stage 1 Tracer Bullet Engineering &amp; Reverse-Engineering Guide</div>
+  <div class="doc-title">Stage 1: New Tab Tracer Bullet — Executive Engineering Notes</div>
+  <div class="doc-subtitle">A clean, concept-first study guide for understanding, defending, and reverse-engineering Obscure's New Tab subsystem.</div>
 
-  <div class="metadata-grid">
-    <div><strong>Target Audience:</strong> Founder &amp; CEO (Zorquelz)</div>
-    <div><strong>Control Branch:</strong> <code>feature/pr-1-qa-corrections</code></div>
-    <div><strong>Author / Lead:</strong> Antigravity (Implementation Lead)</div>
-    <div><strong>Chromium Source Pin:</strong> Tag <code>155.0.8059.39</code> (<code>3ff7ac5a9...</code>)</div>
-    <div><strong>Chief Architect:</strong> ChatGPT</div>
-    <div><strong>Stage 1 Status:</strong> <span class="badge badge-ready">IMPLEMENTATION IN PROGRESS</span></div>
-    <div><strong>Canonical Doc:</strong> <code>docs/features/stage1-tracer-bullet/</code></div>
-    <div><strong>Stage 2 Status:</strong> <span class="badge badge-blocked">STRICTLY BLOCKED (ADR 0002 Proposed)</span></div>
+  <div class="meta-strip">
+    <div class="meta-item">
+      <div class="meta-label">Target Subsystem</div>
+      <div class="meta-val">New Tab Page (Launchpad)</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Chromium Baseline</div>
+      <div class="meta-val">Stable 155.0.8059.39</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">External Diff Size</div>
+      <div class="meta-val">&le;10 Lines (HK-01, HK-02)</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Stage 2 Persistence</div>
+      <div class="meta-val" style="color: #b91c1c;">Gated (ADR 0002 Proposed)</div>
+    </div>
   </div>
 </header>
 
-<h2>1. Executive Summary &amp; Subsystem Architecture</h2>
-<p>
-  This guide is the permanent reference for <strong>Stage 1: New Tab Tracer Bullet</strong>. It documents the complete architectural wiring, exact source code line-by-line, execution flow, security sandbox invariants, and defensible technical rationale.
-</p>
-<div class="callout">
-  <strong>Tracer Bullet Invariant:</strong> Validates the complete vertical integration slice (Build System &rarr; WebUI Configuration &rarr; Sandboxed Renderer Delivery &rarr; Blink Paint) while strictly constraining external Chromium diffs to &le;10 lines and deferring all native persistence to Stage 2.
+<h2><span class="section-num">01</span> The Mental Model: What is a Tracer Bullet?</h2>
+<div class="note-card note-card-highlight">
+  <div class="card-title">
+    <span>The "Tracer Bullet" Principle</span>
+    <span class="badge badge-shim">ARCHITECTURAL PATTERN</span>
+  </div>
+  <p>
+    In complex software, a <strong>Tracer Bullet</strong> is not a prototype you throw away. It is the skinniest possible slice of production code that penetrates through <em>every architectural layer</em>—from the meta-build system to the UI window—proving that the plumbing works before building complex features.
+  </p>
+  <p>
+    <strong>In Stage 1, we do NOT build workspace persistence or database storage.</strong> We only prove that Obscure can compile custom C++, take control of <code>chrome://new-tab-page</code>, stream dark-mode Launchpad assets inside a sandboxed renderer, and strictly drop back to standard Chromium in Incognito mode.
+  </p>
 </div>
 
-<h2>2. End-to-End System Topology &amp; Control Flow</h2>
-<pre>
-                                BROWSER PROCESS (Privileged Host)
-+-----------------------------------------------------------------------------------------------+
-|  1. User triggers NTP (Ctrl+T, '+' button, Omnibox "chrome://newtab")                          |
-|  2. URL Normalizer rewrites "chrome://newtab" -> "chrome://new-tab-page/"                    |
-|  3. WebUIConfigMap queries registered configs for host "new-tab-page":                        |
-|     +---> obscure::ObscureNewTabPageUIConfig::IsWebUIEnabled(BrowserContext*)                 |
-|           |-- Context is Incognito/Guest? -> Returns FALSE (Falls back to upstream NTP)       |
-|           +-- Context is Regular Profile? -> Returns TRUE (Obscure selected)                  |
-|  4. obscure::ObscureNewTabPageUI controller attaches to WebUIDataSource:                      |
-|     +---> Streams bundled in-memory Launchpad HTML, CSS, JS via SetRequestFilter              |
-|     +---> Enforces CSP: script-src 'self' chrome://resources;                                 |
-+-----------------------------------------------------------------------------------------------+
-                                               |
-                     Mojo IPC / RenderProcessHost Spawning / Navigation
-                                               v
-+-----------------------------------------------------------------------------------------------+
-|                                RENDERER PROCESS (Sandboxed Jail)                              |
-|  5. OS Kernel enforces sandbox flags on Renderer PID:                                         |
-|     - Linux PID & User Namespaces active (Layer 1)                                            |
-|     - Linux seccomp-bpf system call filter active: Seccomp: 2, NoNewPrivs: 1 (Layer 2)        |
-|  6. Blink Rendering Engine receives payload, compiles launchpad.js as ES module               |
-|  7. Obscure Launchpad UI composites onto screen buffer (TB-01..04)                            |
-+-----------------------------------------------------------------------------------------------+
-</pre>
+<div class="step-flow">
+  <div class="step-box">
+    <div class="step-header">Phase 1 &bull; Build Hook</div>
+    <div class="step-title">Ninja / GN Link</div>
+    <div class="step-desc">Chromium's build system compiles <code>//chrome/browser/obscure</code> alongside browser core.</div>
+  </div>
+  <div class="step-box">
+    <div class="step-header">Phase 2 &bull; Navigation</div>
+    <div class="step-title">Config Routing</div>
+    <div class="step-desc"><code>WebUIConfigMap</code> checks <code>ObscureNewTabPageUIConfig</code> when user opens a tab.</div>
+  </div>
+  <div class="step-box">
+    <div class="step-header">Phase 3 &bull; Privacy Gate</div>
+    <div class="step-title">Incognito Guard</div>
+    <div class="step-desc">If browsing in Incognito/Guest, returns <code>false</code> to preserve privacy fallback.</div>
+  </div>
+  <div class="step-box">
+    <div class="step-header">Phase 4 &bull; Sandbox Delivery</div>
+    <div class="step-title">In-Memory Stream</div>
+    <div class="step-desc">WebUIDataSource streams Launchpad assets to sandboxed renderer (Seccomp: 2).</div>
+  </div>
+</div>
 
-<h2>3. Exact Source Code &amp; Reverse-Engineering Specification</h2>
+<h2><span class="section-num">02</span> The "Shim Pattern": How We Avoid Rebase Hell</h2>
+<div class="note-card note-card-warning">
+  <div class="card-title">
+    <span>Why 99% of Chromium Forks Fail</span>
+    <span class="badge badge-blocked">LESSON IN ARCHITECTURE</span>
+  </div>
+  <p>
+    Most developers who customize Chromium edit hundreds of upstream files (Omnibox, TabStrip, Profile). When Google releases a new Chromium stable milestone with 50,000 commits, their repository has thousands of merge conflicts and dies.
+  </p>
+  <p>
+    <strong>The Obscure Rule:</strong> Over 98% of our code lives in an isolated directory: <code>//chrome/browser/obscure/</code>. Upstream Chromium is touched in exactly <strong>two files</strong>, totaling under 10 lines of diff.
+  </p>
+</div>
 
-<h3>A. Upstream Chromium Integration Hooks (&le;10 External Lines)</h3>
-<ul>
-  <li>
-    <strong>Hook HK-01 (<code>chrome/browser/ui/webui/chrome_web_ui_configs.cc</code>):</strong>
-    Registers <code>ObscureNewTabPageUIConfig</code> inside <code>RegisterChromeWebUIConfigs()</code> substituting upstream <code>NewTabPageUIConfig</code> on <code>chrome::kChromeUINewTabPageHost</code>.
-  </li>
-  <li>
-    <strong>Hook HK-02 (<code>chrome/browser/BUILD.gn</code>):</strong>
-    Appends <code>"//chrome/browser/obscure"</code> to <code>source_set("browser")</code> public dependencies.
-  </li>
-</ul>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 15%;">Hook ID</th>
+      <th style="width: 35%;">Target File</th>
+      <th style="width: 25%;">Diff Footprint</th>
+      <th style="width: 25%;">What It Does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>HK-01</strong></td>
+      <td><code>chrome/browser/ui/webui/chrome_web_ui_configs.cc</code></td>
+      <td>~3 lines (Line 333)</td>
+      <td>Substitutes <code>NewTabPageUIConfig</code> with <code>ObscureNewTabPageUIConfig</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>HK-02</strong></td>
+      <td><code>chrome/browser/BUILD.gn</code></td>
+      <td>~2 lines (Line 1080)</td>
+      <td>Appends <code>"//chrome/browser/obscure"</code> to browser library dependencies.</td>
+    </tr>
+  </tbody>
+</table>
 
-<h3>B. Isolated Obscure Module (<code>//chrome/browser/obscure/</code>)</h3>
-<p>
-  Over 98% of Obscure's native code lives in this directory. If reverse engineering this subsystem, these are the canonical files:
-</p>
-<ul>
-  <li><code>BUILD.gn</code>: Declares <code>source_set("obscure")</code> depending on <code>//base</code>, <code>//content/public/browser</code>, and <code>//chrome/browser/profiles:profile</code>.</li>
-  <li><code>ui/webui/obscure_new_tab_page_ui_config.h/.cc</code>: Inherits from <code>content::WebUIConfig</code>. In <code>IsWebUIEnabled()</code>, checks <code>!profile->IsOffTheRecord()</code> guaranteeing zero Obscure UI execution in Incognito/Guest.</li>
-  <li><code>ui/webui/obscure_new_tab_page_ui.h/.cc</code>: Inherits from <code>content::WebUIController</code>. Creates <code>content::WebUIDataSource</code> on <code>chrome::kChromeUINewTabPageHost</code> and registers <code>SetRequestFilter</code> streaming compiled in-memory Launchpad HTML, CSS, and JS using <code>base::RefCountedString</code>.</li>
+<h3>Annotated Upstream Code Change (HK-01)</h3>
+<div class="snippet-box">
+<span class="comment">// Inside chrome_web_ui_configs.cc -> RegisterChromeWebUIConfigs()</span>
+<span class="keyword">#if</span> !<span class="func">BUILDFLAG</span>(IS_ANDROID)
+<span class="comment">// 1. Include our isolated header</span>
+<span class="keyword">#include</span> <span class="string">"chrome/browser/obscure/ui/webui/obscure_new_tab_page_ui_config.h"</span>
+
+<span class="comment">// 2. Swap the registration to Obscure's config</span>
+map.<span class="func">AddWebUIConfig</span>(std::<span class="func">make_unique</span>&lt;<span class="type">obscure::ObscureNewTabPageUIConfig</span>&gt;());
+<span class="keyword">#endif</span>
+</div>
+<ul class="annotation-list">
+  <li><code>std::make_unique</code>: Heap-allocates our config object using single-ownership modern C++ semantics.</li>
+  <li><code>map.AddWebUIConfig(...)</code>: Registers the config in Chromium's internal URL lookup table for <code>chrome://new-tab-page</code>.</li>
 </ul>
 
 <div class="page-break"></div>
 
-<h2>4. Security Sandbox Topology &amp; Boundary Protections</h2>
-<table>
-  <thead>
-    <tr>
-      <th style="width: 25%;">Layer</th>
-      <th style="width: 35%;">Enforcement Mechanism</th>
-      <th style="width: 40%;">Security Invariant Established</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Layer 1 Sandbox</strong></td>
-      <td>Linux PID, Mount, and Network Namespaces</td>
-      <td>Renderer process cannot view foreign PIDs, access host filesystems, or establish raw network sockets.</td>
-    </tr>
-    <tr>
-      <td><strong>Layer 2 Sandbox</strong></td>
-      <td>Seccomp-BPF Syscall Filter (<code>Seccomp: 2</code>, <code>NoNewPrivs: 1</code>)</td>
-      <td>Blocks unauthorized system calls (e.g. <code>execve</code>). Privilege escalation is strictly forbidden by the kernel.</td>
-    </tr>
-    <tr>
-      <td><strong>Content Security Policy</strong></td>
-      <td><code>script-src 'self' chrome://resources;</code></td>
-      <td>Strictly forbids inline scripts and <code>eval()</code>. All JavaScript must execute from isolated modules.</td>
-    </tr>
-    <tr>
-      <td><strong>Incognito Isolation</strong></td>
-      <td><code>!profile->IsOffTheRecord()</code> Guard</td>
-      <td>Zero Obscure UI rendered in Incognito/Guest windows; automatically falls back to Chromium's native private splash screens.</td>
-    </tr>
-  </tbody>
-</table>
+<h2><span class="section-num">03</span> Component Breakdown: The 4 Native Files</h2>
 
-<h2>5. Founder Mastery &amp; Technical Defense Scenarios</h2>
-
-<div class="callout-info">
-  <strong>Key Architectural Principle: "The Shim Pattern"</strong><br>
-  Obscure avoids the fatal trap of large Chromium forks (which drown in merge conflicts) by keeping its external diff footprint under 10 lines. Feature logic lives in an isolated module; upstream files only receive minimal registration calls.
+<div class="note-card">
+  <div class="card-title">
+    <span>1. ObscureNewTabPageUIConfig (The Gatekeeper)</span>
+    <span class="badge badge-shim">PRIVACY INVARIANT</span>
+  </div>
+  <p>This class decides <em>when</em> Obscure is allowed to run. Its most critical function is <code>IsWebUIEnabled()</code>:</p>
+  <div class="snippet-box">
+<span class="type">bool</span> <span class="type">ObscureNewTabPageUIConfig</span>::<span class="func">IsWebUIEnabled</span>(content::<span class="type">BrowserContext</span>* browser_context) {
+  <span class="type">Profile</span>* profile = <span class="type">Profile</span>::<span class="func">FromBrowserContext</span>(browser_context);
+  <span class="comment">// If Incognito or Guest, return false! Falls back to native Chromium private screens.</span>
+  <span class="keyword">return</span> profile &amp;&amp; !profile-&gt;<span class="func">IsOffTheRecord</span>();
+}
+  </div>
+  <ul class="annotation-list">
+    <li><strong>Why this matters:</strong> Guarantees that Obscure custom UI and cached project workspaces <strong>never appear in Incognito or Guest sessions</strong> (TB-05, TB-06).</li>
+  </ul>
 </div>
 
-<h3>Realistic Technical Inquiries &amp; Defensible Answers</h3>
+<div class="note-card">
+  <div class="card-title">
+    <span>2. ObscureNewTabPageUI (The WebUI Controller)</span>
+    <span class="badge badge-shim">DATA PIPELINE</span>
+  </div>
+  <p>The controller creates the local virtual server that feeds HTML, CSS, and JS to the renderer process:</p>
+  <div class="snippet-box">
+<span class="comment">// Inside ObscureNewTabPageUI constructor</span>
+content::<span class="type">WebUIDataSource</span>* source =
+    content::<span class="type">WebUIDataSource</span>::<span class="func">CreateAndAdd</span>(context, chrome::kChromeUINewTabPageHost);
 
-<p><strong>Q1: Why not build Obscure as an Electron app or a Chrome Extension?</strong></p>
-<p>
-  <em>Defensible Answer:</em> Electron bundles a separate Node.js runtime and full Chromium instance per app, resulting in severe RAM inflation and an insecure sandbox model where renderer processes can directly touch the operating system. Extensions cannot modify browser network isolation, customize internal memory caching, or integrate system-level devtools without fighting Chrome Web Store permission constraints. Obscure is built directly into Chromium's native C++ engine, preserving full multi-process sandboxing while providing low-level engine control.
-</p>
+<span class="comment">// Streams compiled in-memory strings using RefCountedString</span>
+source-&gt;<span class="func">SetRequestFilter</span>(
+    base::<span class="func">BindRepeating</span>(&amp;ObscureNewTabPageUI::ShouldHandleRequest),
+    base::<span class="func">BindRepeating</span>(&amp;ObscureNewTabPageUI::HandleRequest));
 
-<p><strong>Q2: How does Obscure deliver assets in Stage 1 without touching Chromium's .pak resource files?</strong></p>
-<p>
-  <em>Defensible Answer:</em> Chromium's <code>content::WebUIDataSource</code> provides a <code>SetRequestFilter</code> API that accepts a request path and returns an in-memory <code>base::RefCountedString</code> buffer. By serving compiled Launchpad HTML, CSS, and JS strings directly through this filter, we bypass editing upstream <code>.grd</code> resource files and <code>chrome_paks.gni</code>, keeping Stage 1 external diffs strictly under 10 lines.
-</p>
+<span class="comment">// Enforce zero inline scripts via strict WebUI Content Security Policy</span>
+source-&gt;<span class="func">OverrideContentSecurityPolicy</span>(
+    network::mojom::<span class="type">CSPDirectiveName</span>::ScriptSrc,
+    <span class="string">"script-src 'self' chrome://resources;"</span>);
+  </div>
+  <ul class="annotation-list">
+    <li><strong>Why `SetRequestFilter`?</strong> Allows streaming compiled in-memory assets without modifying Chromium's complex <code>.pak</code> binary archives or resource headers. Keeps Stage 1 external diffs strictly $\le 10$ lines.</li>
+    <li><strong>Why `script-src 'self'`?</strong> Enforces that all JavaScript must be loaded from separate <code>.js</code> files via <code>&lt;script type="module"&gt;</code>. Inline scripts are strictly blocked by the browser.</li>
+  </ul>
+</div>
 
-<p><strong>Q3: What do the flags <code>Seccomp: 2</code> and <code>NoNewPrivs: 1</code> mean?</strong></p>
-<p>
-  <em>Defensible Answer:</em> <code>NoNewPrivs: 1</code> is a Linux kernel bit ensuring that neither the process nor its children can ever acquire additional privileges (e.g. via setuid binaries). <code>Seccomp: 2</code> indicates filtering mode: the kernel validates every syscall against a Berkeley Packet Filter program, killing the process instantly if an unauthorized syscall is attempted.
-</p>
+<h2><span class="section-num">04</span> Security Model: The Multi-Process Sandbox Jail</h2>
+<div class="note-card note-card-security">
+  <div class="card-title">
+    <span>Why Obscure is Far Safer Than Electron</span>
+    <span class="badge badge-pass">SECURITY SUPERIORITY</span>
+  </div>
+  <p>
+    In Electron, a renderer window often has direct access to Node.js APIs (e.g. <code>fs.readFile</code>, <code>child_process.exec</code>), making remote code execution trivial. In Obscure, our Launchpad runs inside a <strong>heavily sandboxed Linux jail</strong>:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Security Layer</th>
+        <th style="width: 35%;">Kernel Flag</th>
+        <th style="width: 40%;">What It Physically Enforces</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Layer 1 Sandbox</strong></td>
+        <td>Linux PID &amp; User Namespaces</td>
+        <td>The renderer cannot see other operating system processes or access host directory paths.</td>
+      </tr>
+      <tr>
+        <td><strong>Layer 2 Sandbox</strong></td>
+        <td><code>Seccomp: 2</code> (Syscall Filter)</td>
+        <td>Linux kernel whitelist. If compromised JS attempts unauthorized syscalls (e.g. <code>execve</code>), kernel kills process instantly.</td>
+      </tr>
+      <tr>
+        <td><strong>Privilege Block</strong></td>
+        <td><code>NoNewPrivs: 1</code></td>
+        <td>Guarantees that neither the process nor its children can ever escalate root privileges (e.g. via <code>sudo</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>WebUI Boundary</strong></td>
+        <td>Site Isolation (<code>chrome://</code> scheme)</td>
+        <td>Standard internet web pages (<code>https://...</code>) are strictly forbidden from embedding or framing our internal WebUI.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-<h2>6. Acceptance Verification Matrix (Test Plan 0003)</h2>
-<table>
-  <thead>
-    <tr>
-      <th style="width: 10%;">ID</th>
-      <th style="width: 35%;">Test Objective</th>
-      <th style="width: 30%;">Execution Command</th>
-      <th style="width: 25%;">Expected Result</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>TB-01..04</strong></td>
-      <td>Launchpad Navigation &amp; DOM</td>
-      <td><code>./out/Stable155/chrome --headless=new --dump-dom chrome://new-tab-page/</code></td>
-      <td>Launchpad cockpit HTML rendered</td>
-    </tr>
-    <tr>
-      <td><strong>TB-05</strong></td>
-      <td>Incognito Isolation</td>
-      <td><code>./out/Stable155/chrome --headless=new --incognito --dump-dom chrome://new-tab-page/</code></td>
-      <td>Standard Incognito splash; 0 Obscure UI</td>
-    </tr>
-    <tr>
-      <td><strong>TB-06</strong></td>
-      <td>Guest Isolation</td>
-      <td><code>./out/Stable155/chrome --headless=new --guest --dump-dom chrome://new-tab-page/</code></td>
-      <td>Standard Guest splash; 0 Obscure UI</td>
-    </tr>
-    <tr>
-      <td><strong>TB-07</strong></td>
-      <td>CSP Enforcement</td>
-      <td><code>./out/Stable155/chrome --headless=new --enable-logging=stderr --v=1 chrome://new-tab-page/</code></td>
-      <td>Zero CSP violations</td>
-    </tr>
-    <tr>
-      <td><strong>TB-08</strong></td>
-      <td>Sandbox Enforcement</td>
-      <td><code>python3 scripts/check_sandbox.py</code> on renderer PID</td>
-      <td><code>NoNewPrivs: 1</code>, <code>Seccomp: 2</code></td>
-    </tr>
-    <tr>
-      <td><strong>TB-10</strong></td>
-      <td>Clean Patch Reversibility</td>
-      <td><code>scripts/test_tb10_patch_revert.sh</code></td>
-      <td><span class="badge badge-pass">PASS (Verified)</span></td>
-    </tr>
-  </tbody>
-</table>
+<h2><span class="section-num">05</span> Founder Mastery: Defending Obscure in 60 Seconds</h2>
+
+<div class="q-block">
+  <div class="q-title">Q: "Why modify Chromium C++ instead of building a Chrome Extension?"</div>
+  <div class="q-answer">
+    <strong>Founder Answer:</strong> Chrome extensions are toys for cosmetic changes. An extension cannot control process memory limits, cannot isolate workspace networking, cannot inspect local listening ports safely, and can be disabled by Chrome policies at any time. By modifying Chromium's native C++ engine, Obscure controls the multi-process architecture directly while preserving full hardware-accelerated rendering and kernel sandboxing.
+  </div>
+</div>
+
+<div class="q-block">
+  <div class="q-title">Q: "How do you know Google won't break your code on the next Chrome update?"</div>
+  <div class="q-answer">
+    <strong>Founder Answer:</strong> Because we follow the <em>Shim Pattern</em>. Over 98% of Obscure code is confined to <code>//chrome/browser/obscure/</code>. Our external touchpoint in upstream Chromium is just two registration hooks totaling under 10 lines. When Chromium updates, we only have to re-verify those two hooks.
+  </div>
+</div>
+
+<div class="q-block">
+  <div class="q-title">Q: "Does Obscure store workspace data on disk in Stage 1?"</div>
+  <div class="q-answer">
+    <strong>Founder Answer:</strong> No. Stage 1 is strictly a Tracer Bullet. It proves the build pipeline, configuration routing, and sandboxed WebUI delivery. All native disk persistence and database serialization are intentionally deferred to Stage 2 under ADR 0002 to maintain rigorous scope boundaries.
+  </div>
+</div>
 
 </body>
 </html>
