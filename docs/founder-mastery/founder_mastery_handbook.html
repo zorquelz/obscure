@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Obscure — Founder Mastery Engineering Handbook</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 14mm 18mm 14mm;
+    @bottom-right {
+      content: counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: #64748b;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    line-height: 1.45;
+    font-size: 9pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+
+  .logo-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  h1 {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 3px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #0284c7;
+    margin: 0 0 8px 0;
+  }
+
+  .metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px 14px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 8pt;
+  }
+
+  .metadata-grid div strong {
+    color: #334155;
+    display: inline-block;
+    width: 140px;
+  }
+
+  h2 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 3px;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin: 0 0 6px 0;
+  }
+
+  ul, ol {
+    margin: 3px 0 6px 0;
+    padding-left: 18px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 6.8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .badge-pass { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .badge-info { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0 10px 0;
+    font-size: 7.5pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 4px 6px;
+    text-align: left;
+    vertical-align: top;
+    border: 1px solid #cbd5e1;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  code, pre {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 7.5pt;
+  }
+
+  code {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 3px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 8px 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 5px 0 8px 0;
+    line-height: 1.3;
+    white-space: pre-wrap;
+    word-break: break-all;
+    page-break-inside: avoid;
+  }
+
+  .callout {
+    background-color: #f0fdf4;
+    border-left: 3px solid #16a34a;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-size: 8pt;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .callout-info {
+    background-color: #eff6ff;
+    border-left: 3px solid #2563eb;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-size: 8pt;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-title">
+    <h1>OBSCURE &mdash; The Builder's Browser</h1>
+    <span style="font-size: 8pt; font-weight: 700; color: #64748b;">ZORQUELZ TECHNOLOGIES</span>
+  </div>
+  <div class="subtitle">Founder Mastery Engineering &amp; Architecture Handbook</div>
+
+  <div class="metadata-grid">
+    <div><strong>Target Audience:</strong> Founder &amp; CEO (Zorquelz)</div>
+    <div><strong>Control Branch:</strong> <code>feature/pr-1-qa-corrections</code></div>
+    <div><strong>Author / Lead:</strong> Antigravity (Implementation Lead)</div>
+    <div><strong>Chromium Baseline:</strong> Stable <code>155.0.8059.39</code></div>
+    <div><strong>Chief Architect:</strong> ChatGPT</div>
+    <div><strong>Document Purpose:</strong> Complete Founder Mastery &amp; Technical Defense</div>
+  </div>
+</header>
+
+<h2>1. Chapter 1: Chromium Multi-Process Architecture &amp; Engine Internals</h2>
+<p>
+  Chromium is designed as an <strong>operating system inside an operating system</strong> to prevent single-tab memory leaks and crashes from destabilizing the entire browser window.
+</p>
+<pre>
+                            [ USER DESKTOP ]
+                                   |
+                                   v
+             +-------------------------------------------+
+             |         BROWSER PROCESS (Privileged)      |
+             |  - UI Chrome (Tabs, Omnibox, Windows)     |
+             |  - Network Sockets & Disk I/O             |
+             |  - Storage (Cookies, History, DBs)        |
+             +-------------------------------------------+
+                     /             |             \
+          Mojo IPC  /   Mojo IPC   |   Mojo IPC   \  Mojo IPC
+                   /               |               \
+                  v                v                v
+     +-----------------+  +-----------------+  +-----------------+
+     |  RENDERER PID   |  |   GPU PROCESS   |  | NETWORK PROCESS |
+     |  (chrome://...) |  |  (Compositor /  |  | (HTTP/3, TLS,   |
+     |  - Blink Engine |  |   Vulkan / GL)  |  |  DNS Resolution)|
+     |  - V8 JS Engine |  +-----------------+  +-----------------+
+     |  - SANDBOXED    |
+     +-----------------+
+</pre>
+<ul>
+  <li><strong>Browser Process:</strong> Privileged supervisor. Owns OS window handles, disk profile I/O, and raw network sockets.</li>
+  <li><strong>Renderer Process:</strong> Sandboxed worker. Runs Blink (HTML/CSS layout) and V8 (JavaScript execution). Has zero raw disk or socket access.</li>
+  <li><strong>Zygote Process:</strong> Pre-forked Linux template process used to spawn warm renderers instantly without full process startup overhead.</li>
+  <li><strong>WebUI:</strong> Chromium's native pipeline for building internal browser pages using web standards backed by C++ controllers.</li>
+</ul>
+
+<h2>2. Chapter 2: The "Shim Pattern" &amp; Rebase Sustainability</h2>
+<div class="callout">
+  <strong>The 10-Line Rule:</strong> Large Chromium forks fail because they scatter modifications across core files. Obscure places &gt;98% of its code in <code>//chrome/browser/obscure/</code> and restricts core diffs to &le;10 lines of registration hooks.
+</div>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 15%;">Hook ID</th>
+      <th style="width: 40%;">File &amp; Location</th>
+      <th style="width: 45%;">Responsibility</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>HK-01</strong></td>
+      <td><code>chrome/browser/ui/webui/chrome_web_ui_configs.cc</code></td>
+      <td>Registers <code>ObscureNewTabPageUIConfig</code> substituting upstream NTP on <code>chrome::kChromeUINewTabPageHost</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>HK-02</strong></td>
+      <td><code>chrome/browser/BUILD.gn</code></td>
+      <td>Appends <code>"//chrome/browser/obscure"</code> to <code>source_set("browser")</code> public dependencies.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h2>3. Chapter 3: Git Workflow, Bundles &amp; Bulletproof Rollback Safety</h2>
+<p>
+  Chromium contains over 40 million lines of code. Reckless commands can destroy weeks of work. Obscure operates under a four-tier rollback safety model:
+</p>
+<ol>
+  <li><strong>Tier 1 (Git Revert):</strong> Creates inverse commits; non-destructive.</li>
+  <li><strong>Tier 2 (Patch Reversal):</strong> <code>git apply --reverse</code> cleanly removes a patch series.</li>
+  <li><strong>Tier 3 (Hard Reset to Immutable Tag):</strong> <code>git reset --hard obscure-baseline-155.0.8059.39</code> guarantees 100% clean baseline recovery.</li>
+  <li><strong>Tier 4 (Git Bundles):</strong> <code>git bundle create backups/obscure.bundle ...</code> packages full commits into portable binary archives that restore identically even after hard resets.</li>
+</ol>
+<div class="callout-info">
+  <strong>Line Ending Invariant:</strong> We enforce <code>*.patch -text</code> in <code>.gitattributes</code> so Windows Git never converts LF to CRLF, preventing <code>git am</code> patch failures inside WSL2.
+</div>
+
+<h2>4. Chapter 4: Script Tooling &amp; Empirical QA Runners</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">Script</th>
+      <th style="width: 35%;">Mechanics &amp; Flags</th>
+      <th style="width: 40%;">What It Establishes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>sync_sources.py</code></td>
+      <td>Computes SHA-256 of native C++ and WebUI files; copies to WSL2 tree without symlinks.</td>
+      <td>Guarantees 100% deterministic code synchronization without cross-filesystem NTFS/ext4 index corruption.</td>
+    </tr>
+    <tr>
+      <td><code>test_tb10_patch_revert.sh</code></td>
+      <td>Creates synthetic patch, tests <code>git apply --check</code>, applies with <code>git am</code>, and resets to baseline tag.</td>
+      <td>Proves TB-10: patches apply cleanly and revert with 100% exact cryptographic hash match (<code>tb10_revert_test.log</code>).</td>
+    </tr>
+    <tr>
+      <td><code>check_sandbox.py</code></td>
+      <td>Inspects live <code>/proc/&lt;pid&gt;/status</code> and <code>/proc/&lt;pid&gt;/ns/</code> on active Chromium processes.</td>
+      <td>Confirms <code>Seccomp: 2</code> (BPF syscall filter) and <code>NoNewPrivs: 1</code> (no privilege escalation) on live renderers.</td>
+    </tr>
+    <tr>
+      <td><code>demonstrate_rollback_recovery.sh</code></td>
+      <td>Simulates custom Obscure work, creates Git bundle, hard resets to baseline, and pulls from bundle.</td>
+      <td>Empirically proves zero work loss: <code>BEFORE_COMMIT == AFTER_COMMIT</code> (<code>rollback_recovery_demonstration.log</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Chapter 5: Founder Defensible Knowledge (Investor &amp; Architect Q&amp;A)</h2>
+<p><strong>Q: Why did you build Obscure on Chromium rather than building a browser engine from scratch?</strong></p>
+<p>
+  <em>Answer:</em> Building a modern web rendering engine from scratch requires handling decades of CSS, HTML5, WebGL, WebGPU, JavaScript specifications, and thousands of video/audio codecs. Even Microsoft gave up on EdgeHTML to adopt Chromium. Chromium is the de facto engine of the modern web. Obscure's value is not reinventing the wheel—it's taking Chromium's world-class engine and giving developers unprecedented security isolation, workspace intelligence, and deep network/port visibility.
+</p>
+
+<p><strong>Q: How do you guarantee user privacy in Incognito windows?</strong></p>
+<p>
+  <em>Answer:</em> We enforce privacy at the C++ configuration layer. In <code>ObscureNewTabPageUIConfig::IsWebUIEnabled()</code>, we check <code>!profile-&gt;IsOffTheRecord()</code>. In Incognito and Guest modes, this returns false, causing Chromium to fall back to its native private screens. Obscure UI and custom state never load inside private sessions.
+</p>
+
+</body>
+</html>
